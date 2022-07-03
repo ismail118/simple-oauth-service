@@ -1,0 +1,65 @@
+for example
+https://plantuml.com/ie-diagram
+
+@startuml
+entity User {
+  * id : INT
+  --
+  * email : VARCHAR
+  * password : VARCHAR
+  first_name : VARCHAR
+  last_name : VARCHAR
+  * user_role_id : INT
+  * company_id : INT
+  principal_id : INT
+  distributor_id : INT
+  buyer_id : INT
+  token_version : INT
+  * is_verified : BOOL
+  * is_delete : BOOL
+  * created_at : TIMESTAMP
+  * update_at : TIMESTAMP
+  * created_by : VARCHAR
+  * update_by : VARCHAR
+}
+
+entity User_Role {
+  * id : INT
+  --
+  * role : VARCHAR
+  * created_at : TIMESTAMP
+}
+
+entity Data_Scope {
+  * id : INT
+  --
+  * user_id : INT
+  principal_id : INT
+  distributor_id : INT
+  buyer_id : INT
+  * is_delete : BOOL
+  * created_at : TIMESTAMP
+  * update_at : TIMESTAMP
+  * created_by : VARCHAR
+  * update_by : VARCHAR
+}
+
+entity Client {
+  * id : INT
+  --
+  * user_id : INT
+  * application_name : VARCHAR
+  * client_secret : VARCHAR
+  * is_delete : BOOL
+  * created_at : TIMESTAMP
+  * update_at : TIMESTAMP
+  * created_by : VARCHAR
+  * update_by : VARCHAR
+}
+
+
+User }o--|| User_Role
+User ||--o{ Data_Scope
+User ||--o{ Client
+
+@enduml

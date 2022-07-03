@@ -1,0 +1,16 @@
+For Example
+https://plantuml.com/use-case-diagram
+@startuml
+left to right direction
+actor "Admin" as admin
+actor "Admin" as admin
+actor "Admin" as admin
+
+usecase "Accept Register User" as UC1
+usecase "See data Report all user" as UC2
+usecase "Create data connection between principal and buyer" as UC3
+
+admin --> UC1
+admin --> UC2
+admin --> UC3
+@enduml

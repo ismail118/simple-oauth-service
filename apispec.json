@@ -1,0 +1,1320 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Simple Oauth Service",
+    "description": "Api Specification For Simple Oauth Service",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:3000"
+    }
+  ],
+  "paths": {
+    "/oauth/authorize": {
+      "post": {
+        "tags": ["OAuth2 API"],
+        "description": "Service for authorize client",
+        "summary": "Service for authorize client",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "client_id": {
+                    "type": "integer"
+                  },
+                  "redirect_url": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "301": {
+            "description": "Moved Permanently",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oauth/login/{clientId}/{redirectUrl}": {
+      "post": {
+        "tags": ["OAuth2 API"],
+        "description": "Service for user login response_type code",
+        "summary": "Service for user login response_type code",
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "description": "client id"
+          },
+          {
+            "name": "redirect_url",
+            "in": "path",
+            "description": "redirect url"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Generate Authorize Code",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "authorization_code": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oauth/access_token": {
+      "post": {
+        "tags": ["OAuth2 API"],
+        "description": "Service for generate access_token from authorize_code",
+        "summary": "Service for generate access_token from authorize_code",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "authorize_code": {
+                    "type": "string"
+                  },
+                  "client_id": {
+                    "type": "number"
+                  },
+                  "client_secret": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Generate Access Token",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string",
+                  "example": "jid=abcdef1234"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oauth/refresh_token": {
+      "post": {
+        "security": [{
+          "CookieAuth": []
+        }],
+        "tags": ["OAuth2 API"],
+        "description": "Service for refresh access_token with use refresh_token",
+        "summary": "Service for refresh access_token with use refresh_token",
+        "responses": {
+          "200": {
+            "description": "Success Generate Access Token",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string",
+                  "example": "jid=abcdef1234"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "access_token": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/oauth/revoke_refresh_token": {
+      "post": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["OAuth2 API"],
+        "description": "Service for revoke refresh_token",
+        "summary": "Service for revoke refresh_token",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Revoke Refresh Token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/user": {
+      "get": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["User API"],
+        "description": "List All User",
+        "summary": "List All User",
+        "responses": {
+          "200": {
+            "description": "Success Get All user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/user"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["User API"],
+        "description": "Create New User",
+        "summary": "Create New User",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/userCreateOrUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Create User",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/user"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/{userId}": {
+      "get": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["User API"],
+        "description": "Get user by id",
+        "summary": "Get user by id",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "user id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success Get User",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/user"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["User API"],
+        "description": "Update user by id",
+        "summary": "Update user by id",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "user id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/userCreateOrUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Update User",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/user"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["User API"],
+        "description": "Delete user by id",
+        "summary": "Delete user by id",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "user id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success Delete User",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/user_role": {
+      "get": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["User Role API"],
+        "description": "List All User Role",
+        "summary": "List All User Role",
+        "responses": {
+          "200": {
+            "description": "Success Get All user_role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/user_role"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["User Role API"],
+        "description": "Create New User Role",
+        "summary": "Create New User Role",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/user_roleCreateOrUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Create User Role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/user_role"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user_role/{userRoleId}": {
+      "get": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["User Role API"],
+        "description": "Get user_role by id",
+        "summary": "Get user_role by id",
+        "parameters": [
+          {
+            "name": "userRoleId",
+            "in": "path",
+            "description": "user_role id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success Get User Role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/user_role"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["User Role API"],
+        "description": "Update user_role by id",
+        "summary": "Update user_role by id",
+        "parameters": [
+          {
+            "name": "userRoleId",
+            "in": "path",
+            "description": "user_role id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/user_roleCreateOrUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Update User Role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/user_role"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["User Role API"],
+        "description": "Delete user_role by id",
+        "summary": "Delete user_role by id",
+        "parameters": [
+          {
+            "name": "userRoleId",
+            "in": "path",
+            "description": "user_role id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success Delete User Role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/data_scope": {
+      "get": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["Data Scope API"],
+        "description": "List All Data Scope",
+        "summary": "List All Data Scope",
+        "responses": {
+          "200": {
+            "description": "Success Get All data_scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/data_scope"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["Data Scope API"],
+        "description": "Create New Data Scope",
+        "summary": "Create New Data Scope",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/data_scopeCreateOrUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Create Data Scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/data_scope"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/data_scope/{dataScopeId}": {
+      "get": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["Data Scope API"],
+        "description": "Get data_scope by id",
+        "summary": "Get data_scope by id",
+        "parameters": [
+          {
+            "name": "dataScopeId",
+            "in": "path",
+            "description": "data_scope id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success Get Data Scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/data_scope"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["Data Scope API"],
+        "description": "Update data_scope by id",
+        "summary": "Update data_scope by id",
+        "parameters": [
+          {
+            "name": "dataScopeId",
+            "in": "path",
+            "description": "data_scope id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/data_scopeCreateOrUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Update Data Scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/data_scope"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["Data Scope API"],
+        "description": "Delete data_scope by id",
+        "summary": "Delete data_scope by id",
+        "parameters": [
+          {
+            "name": "dataScopeId",
+            "in": "path",
+            "description": "data_scope id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success Delete Data Scope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/api/client": {
+      "get": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["Client API"],
+        "description": "List All Client",
+        "summary": "List All Client",
+        "responses": {
+          "200": {
+            "description": "Success Get All client",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/client"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["Client API"],
+        "description": "Create New Client",
+        "summary": "Create New Client",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/clientCreateOrUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Create Client",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/client"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/client/{clientId}": {
+      "get": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["Client API"],
+        "description": "Get client by id",
+        "summary": "Get client by id",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "client id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success Get Client",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/client"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["Client API"],
+        "description": "Update client by id",
+        "summary": "Update client by id",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "client id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/clientCreateOrUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Update Client",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/client"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["Client API"],
+        "description": "Delete client by id",
+        "summary": "Delete client by id",
+        "parameters": [
+          {
+            "name": "clientId",
+            "in": "path",
+            "description": "client id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success Delete Client",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+  },
+  "components": {
+    "securitySchemes": {
+      "Auth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Authorization-Key",
+        "description": "Authorization for protected resource"
+      },
+      "CookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "jid",
+        "description": "jid is alias for refresh token, the named like this for purpose make everyone confused wtf it is"
+      }
+    },
+    "schemas": {
+      "user": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "email": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "user_role_id": {
+            "type": "number"
+          },
+          "company_id": {
+            "type": "number"
+          },
+          "principal_id": {
+            "type": "number"
+          },
+          "distributor_id": {
+            "type": "number"
+          },
+          "buyer_id": {
+            "type": "number"
+          },
+          "token_version": {
+            "type": "number"
+          },
+          "is_verified": {
+            "type": "boolean"
+          },
+          "is_delete": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "date"
+          },
+          "update_at": {
+            "type": "date"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "updated_by": {
+            "type": "string"
+          }
+        }
+      },
+      "userCreateOrUpdate": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "user_role_id": {
+            "type": "number"
+          },
+          "company_id": {
+            "type": "number"
+          },
+          "principal_id": {
+            "type": "number"
+          },
+          "distributor_id": {
+            "type": "number"
+          },
+          "buyer_id": {
+            "type": "number"
+          },
+          "is_verified": {
+            "type": "boolean"
+          },
+          "is_delete": {
+            "type": "boolean"
+          }
+        }
+      },
+      "user_role": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "role": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "date"
+          }
+        }
+      },
+      "user_roleCreateOrUpdate": {
+        "type": "object",
+        "properties": {
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "data_scope": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "user_id": {
+            "type": "number"
+          },
+          "principal_id": {
+            "type": "number"
+          },
+          "distributor_id": {
+            "type": "number"
+          },
+          "buyer_id": {
+            "type": "number"
+          },
+          "is_delete": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "date"
+          },
+          "update_at": {
+            "type": "date"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "updated_by": {
+            "type": "string"
+          }
+        }
+      },
+      "data_scopeCreateOrUpdate": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "number"
+          },
+          "principal_id": {
+            "type": "number"
+          },
+          "distributor_id": {
+            "type": "number"
+          },
+          "buyer_id": {
+            "type": "number"
+          },
+          "is_delete": {
+            "type": "boolean"
+          }
+        }
+      },
+      "client": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "user_id": {
+            "type": "number"
+          },
+          "application_name": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "is_delete": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "date"
+          },
+          "update_at": {
+            "type": "date"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "updated_by": {
+            "type": "string"
+          }
+        }
+      },
+      "clientCreateOrUpdate": {
+        "type": "object",
+        "properties": {
+          "application_name": {
+            "type": "string"
+          },
+          "client_secret": {
+            "type": "string"
+          },
+          "is_delete": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}
