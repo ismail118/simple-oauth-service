@@ -7,8 +7,8 @@ entity User {
   --
   * email : VARCHAR
   * password : VARCHAR
-  first_name : VARCHAR
-  last_name : VARCHAR
+  *first_name : VARCHAR
+  *last_name : VARCHAR
   * user_role_id : INT
   * company_id : INT
   principal_id : INT

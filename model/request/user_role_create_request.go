@@ -1,5 +1,5 @@
 package request
 
 type UserRoleCreateRequest struct {
-	Role string `json:"role"`
+	Role string `validate:"required" json:"role"`
 }

@@ -71,7 +71,8 @@ func (service *ClientServiceImpl) Create(ctx ctx.Context, request request.Client
 
 	client := domain.ClientModel{
 		ApplicationName: request.ApplicationName,
-		ClientSecret:    request.ClientSecret,
+		UserId:          ctx.User.Id,
+		ClientSecret:    helper.RandStringBytes(15),
 		IsDelete:        false,
 		CreatedAt:       time.Now(),
 		UpdatedAt:       time.Now(),
@@ -104,7 +105,7 @@ func (service *ClientServiceImpl) Update(ctx ctx.Context, request request.Client
 		Id:              client.Id,
 		UserId:          client.UserId,
 		ApplicationName: request.ApplicationName,
-		ClientSecret:    request.ClientSecret,
+		ClientSecret:    client.ClientSecret,
 		IsDelete:        request.IsDelete,
 		CreatedAt:       client.CreatedAt,
 		UpdatedAt:       time.Now(),

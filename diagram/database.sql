@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS client (
     created_by varchar(255) NOT NULL,
     updated_by varchar(255) NOT NULL,
 
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES user(id)
 );
 

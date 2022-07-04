@@ -1,6 +1,6 @@
 package request
 
 type AuthorizeRequest struct {
-	ClientId    int64  `json:"client_id"`
-	RedirectUrl string `json:"redirect_url"`
+	ClientId    int64  `validate:"required" json:"client_id"`
+	RedirectUrl string `validate:"required" json:"redirect_url"`
 }

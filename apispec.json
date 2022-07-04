@@ -334,7 +334,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/userCreateOrUpdate"
+                "$ref": "#/components/schemas/userCreate"
               }
             }
           }
@@ -421,7 +421,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/userCreateOrUpdate"
+                "$ref": "#/components/schemas/userUpdate"
               }
             }
           }
@@ -533,7 +533,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/user_roleCreateOrUpdate"
+                "$ref": "#/components/schemas/user_roleCreate"
               }
             }
           }
@@ -620,7 +620,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/user_roleCreateOrUpdate"
+                "$ref": "#/components/schemas/user_roleUpdate"
               }
             }
           }
@@ -732,7 +732,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/data_scopeCreateOrUpdate"
+                "$ref": "#/components/schemas/data_scopeCreate"
               }
             }
           }
@@ -819,7 +819,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/data_scopeCreateOrUpdate"
+                "$ref": "#/components/schemas/data_scopeUpdate"
               }
             }
           }
@@ -931,7 +931,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/clientCreateOrUpdate"
+                "$ref": "#/components/schemas/clientCreate"
               }
             }
           }
@@ -1018,7 +1018,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/clientCreateOrUpdate"
+                "$ref": "#/components/schemas/clientUpdate"
               }
             }
           }
@@ -1154,7 +1154,7 @@
           }
         }
       },
-      "userCreateOrUpdate": {
+      "userCreate": {
         "type": "object",
         "properties": {
           "email": {
@@ -1183,9 +1183,35 @@
           },
           "buyer_id": {
             "type": "number"
+          }
+        }
+      },
+      "userUpdate": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
           },
-          "is_verified": {
-            "type": "boolean"
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "user_role_id": {
+            "type": "number"
+          },
+          "company_id": {
+            "type": "number"
+          },
+          "principal_id": {
+            "type": "number"
+          },
+          "distributor_id": {
+            "type": "number"
+          },
+          "buyer_id": {
+            "type": "number"
           },
           "is_delete": {
             "type": "boolean"
@@ -1206,9 +1232,20 @@
           }
         }
       },
-      "user_roleCreateOrUpdate": {
+      "user_roleCreate": {
         "type": "object",
         "properties": {
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "user_roleUpdate": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
           "role": {
             "type": "string"
           }
@@ -1249,7 +1286,24 @@
           }
         }
       },
-      "data_scopeCreateOrUpdate": {
+      "data_scopeCreate": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "number"
+          },
+          "principal_id": {
+            "type": "number"
+          },
+          "distributor_id": {
+            "type": "number"
+          },
+          "buyer_id": {
+            "type": "number"
+          }
+        }
+      },
+      "data_scopeUpdate": {
         "type": "object",
         "properties": {
           "user_id": {
@@ -1301,13 +1355,18 @@
           }
         }
       },
-      "clientCreateOrUpdate": {
+      "clientCreate": {
         "type": "object",
         "properties": {
           "application_name": {
             "type": "string"
-          },
-          "client_secret": {
+          }
+        }
+      },
+      "clientUpdate": {
+        "type": "object",
+        "properties": {
+          "application_name": {
             "type": "string"
           },
           "is_delete": {

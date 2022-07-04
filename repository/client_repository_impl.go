@@ -95,8 +95,9 @@ func (repository *ClientRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, cl
 }
 
 func (repository *ClientRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, client domain.ClientModel) domain.ClientModel {
-	querySql := "UPDATE client SET application_name = ?, client_secret = ?, is_delete = ?, updated_at = ?, updated_by = ? WHERE id = ?"
+	querySql := "UPDATE client SET user_id = ?, application_name = ?, client_secret = ?, is_delete = ?, updated_at = ?, updated_by = ? WHERE id = ?"
 	_, err := tx.ExecContext(ctx, querySql,
+		client.UserId,
 		client.ApplicationName,
 		client.ClientSecret,
 		client.IsDelete,

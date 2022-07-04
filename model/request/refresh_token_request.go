@@ -1,5 +1,5 @@
 package request
 
 type RefreshTokenRequest struct {
-	RefreshToken string `json:"refresh_token"`
+	RefreshToken string `validate:"required" json:"refresh_token"`
 }

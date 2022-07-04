@@ -121,7 +121,7 @@ func (service *UserServiceImpl) Update(ctx ctx.Context, request request.UserUpda
 		DistributorId: request.DistributorId,
 		BuyerId:       request.BuyerId,
 		TokenVersion:  user.TokenVersion,
-		IsVerified:    request.IsVerified,
+		IsVerified:    user.IsVerified,
 		IsDelete:      request.IsDelete,
 		UpdatedAt:     time.Now(),
 		CreatedAt:     user.CreatedAt,
