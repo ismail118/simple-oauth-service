@@ -29,6 +29,8 @@ func NewRouter(oauth2Controller controller.OAuth2Controller,
 	router.HandleFunc("/api/user/{userId}", userController.FindById).Methods(http.MethodGet)
 	router.HandleFunc("/api/user/{userId}", userController.Update).Methods(http.MethodPut)
 	router.HandleFunc("/api/user/{userId}", userController.Delete).Methods(http.MethodDelete)
+	router.HandleFunc("/api/user/change_password/{userId}", userController.ChangePassword).Methods(http.MethodPut)
+	router.HandleFunc("/api/user/validate", userController.Validate).Methods(http.MethodPost)
 
 	router.HandleFunc("/api/user_role", userRoleController.FindAll).Methods(http.MethodGet)
 	router.HandleFunc("/api/user_role", userRoleController.Create).Methods(http.MethodPost)

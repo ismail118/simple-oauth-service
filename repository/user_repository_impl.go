@@ -148,3 +148,40 @@ func (repository *UserRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, us
 	_, err := tx.ExecContext(ctx, querySql, user.Id)
 	helper.PanicIfError(err)
 }
+
+func (repository *UserRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.UserModel, error) {
+	querySql := "SELECT id, email, password, first_name, last_name, user_role_id, company_id, principal_id, distributor_id, buyer_id, token_version, is_verified, is_delete, created_at, updated_at, created_by, updated_by FROM user WHERE email = ?"
+
+	rows, err := tx.QueryContext(ctx, querySql, email)
+	helper.PanicIfError(err)
+	defer rows.Close()
+
+	var user domain.UserModel
+
+	if rows.Next() {
+		rows.Scan(
+			&user.Id,
+			&user.Email,
+			&user.Password,
+			&user.FirstName,
+			&user.LastName,
+			&user.UserRoleId,
+			&user.CompanyId,
+			&user.PrincipalId,
+			&user.DistributorId,
+			&user.BuyerId,
+			&user.TokenVersion,
+			&user.IsVerified,
+			&user.IsDelete,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+			&user.CreatedBy,
+			&user.UpdatedBy,
+		)
+
+	} else {
+		return user, errors.New("data not found")
+	}
+
+	return user, nil
+}

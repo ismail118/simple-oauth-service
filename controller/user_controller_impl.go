@@ -59,15 +59,12 @@ func (controller *UserControllerImpl) Create(w http.ResponseWriter, r *http.Requ
 	var userCreateRequest request.UserCreatedRequest
 	helper.ReadFromRequestBody(r, &userCreateRequest)
 
-	ctx, err := ctx2.ToCtxContext(r.Context())
-	helper.PanicIfError(err)
-
-	userResponse := controller.UserService.Create(ctx, userCreateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	messageResponse := controller.UserService.Create(r.Context(), userCreateRequest)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
 		Status: constanta.Status200,
-		Data:   userResponse,
+		Data:   messageResponse,
 	}
 
 	helper.WriteToResponseBody(w, webResponse)
@@ -110,6 +107,46 @@ func (controller *UserControllerImpl) Delete(w http.ResponseWriter, r *http.Requ
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
 		Status: constanta.Status200,
+	}
+
+	helper.WriteToResponseBody(w, webResponse)
+}
+
+func (controller *UserControllerImpl) Validate(w http.ResponseWriter, r *http.Request) {
+	var validateRequest request.ValidateRequest
+	helper.ReadFromRequestBody(r, &validateRequest)
+
+	messageResponse := controller.UserService.Validate(r.Context(), validateRequest)
+
+	webResponse := response.WebResponse{
+		Code:   http.StatusOK,
+		Status: constanta.Status200,
+		Data:   messageResponse,
+	}
+
+	helper.WriteToResponseBody(w, webResponse)
+}
+
+func (controller *UserControllerImpl) ChangePassword(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+
+	userId, err := strconv.ParseInt(vars["userId"], 10, 64)
+	helper.PanicIfError(err)
+
+	var changePasswordRequest request.ChangePasswordRequest
+	helper.ReadFromRequestBody(r, &changePasswordRequest)
+
+	changePasswordRequest.Id = userId
+
+	ctx, err := ctx2.ToCtxContext(r.Context())
+	helper.PanicIfError(err)
+
+	messageResponse := controller.UserService.ChangePassword(ctx, changePasswordRequest)
+
+	webResponse := response.WebResponse{
+		Code:   http.StatusOK,
+		Status: constanta.Status200,
+		Data:   messageResponse,
 	}
 
 	helper.WriteToResponseBody(w, webResponse)

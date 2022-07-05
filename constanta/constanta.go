@@ -20,6 +20,9 @@ const RoleAdmin = "admin"
 const StateSecret = "xQ&#1Y@"
 const State = "state"
 const ExpiredToken = "Expired Token"
+const SomeoneAlreadyUseThisEmail = "Someone Already Use This Email"
+const InvalidOtp = "Invalid OTP"
+const SubjectUserCreate = "Your OTP from Simple Oauth Service"
 
 //HTTP STATUS
 //Successful responses

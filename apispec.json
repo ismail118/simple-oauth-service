@@ -256,7 +256,7 @@
         "summary": "Service for revoke refresh_token",
         "requestBody": {
           "content": {
-            "application/x-www-form-urlencoded": {
+            "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
@@ -354,7 +354,7 @@
                       "type": "string"
                     },
                     "data": {
-                      "$ref": "#/components/schemas/user"
+                      "$ref": "#/components/schemas/Message"
                     }
                   }
                 }
@@ -477,6 +477,99 @@
                     },
                     "status": {
                       "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/change_password/{userId}": {
+      "put": {
+        "security": [{
+          "Auth": []
+        }],
+        "tags": ["User API"],
+        "description": "Change password user by id",
+        "summary": "Change password user by id",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "user id"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/userChangePassword"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Change User Password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Message"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/user/validate": {
+      "post": {
+        "tags": ["User API"],
+        "description": "Service for validate account using otp",
+        "summary": "Service for validate account using otp",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "otp": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success Validate Account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Message"
                     }
                   }
                 }
@@ -1218,6 +1311,17 @@
           }
         }
       },
+      "userChangePassword": {
+        "type": "object",
+        "properties": {
+          "old_password": {
+            "type": "string"
+          },
+          "new_password": {
+            "type": "string"
+          }
+        }
+      },
       "user_role": {
         "type": "object",
         "properties": {
@@ -1371,6 +1475,14 @@
           },
           "is_delete": {
             "type": "boolean"
+          }
+        }
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
           }
         }
       }

@@ -39,6 +39,11 @@ func AuthorizationHandler(next http.Handler) http.Handler {
 			},
 			{
 				Method:      "POST",
+				Url:         "/api/user/validate",
+				IsUrlPrefix: false,
+			},
+			{
+				Method:      "POST",
 				Url:         "/oauth/login/",
 				IsUrlPrefix: true,
 			},
