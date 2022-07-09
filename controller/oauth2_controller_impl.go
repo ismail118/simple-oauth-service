@@ -51,9 +51,7 @@ func (controller *OAuth2ControllerImpl) Login(w http.ResponseWriter, r *http.Req
 		t, err2 := template.ParseFS(templates.Templates, "*.gohtml")
 		helper.PanicIfError(err2)
 
-		err2 = t.ExecuteTemplate(w, "login.gohtml", map[string]interface{}{
-			"loginUrl": fmt.Sprintf("/login/%d/%s", clientId, redirectUrl),
-		})
+		err2 = t.ExecuteTemplate(w, "login.gohtml", fmt.Sprintf("/oauth/login/%d/%s", clientId, redirectUrl))
 		helper.PanicIfError(err2)
 		return
 	}
