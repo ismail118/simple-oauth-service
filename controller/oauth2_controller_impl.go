@@ -2,7 +2,6 @@ package controller
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
@@ -104,7 +103,6 @@ func (controller *OAuth2ControllerImpl) RefreshToken(w http.ResponseWriter, r *h
 		Status: constanta.Status200,
 		Data:   accessTokenResponse,
 	}
-	context.Background()
 
 	helper.WriteToResponseBodyWithCookie(w, cookie, webResponse)
 }
@@ -121,4 +119,30 @@ func (controller *OAuth2ControllerImpl) RevokeRefreshToken(w http.ResponseWriter
 	}
 
 	helper.WriteToResponseBody(w, webResponse)
+}
+
+func (controller *OAuth2ControllerImpl) InternalLogin(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		t, err2 := template.ParseFS(templates.Templates, "*.gohtml")
+		helper.PanicIfError(err2)
+
+		err2 = t.ExecuteTemplate(w, "login.gohtml", "/login")
+		helper.PanicIfError(err2)
+		return
+	}
+
+	credential := request.LoginRequest{
+		Email:    r.FormValue("email"),
+		Password: r.FormValue("password"),
+	}
+
+	accessTokenResponse, cookie := controller.Oauth2Service.InternalLogin(r.Context(), credential)
+
+	webResponse := response.WebResponse{
+		Code:   http.StatusOK,
+		Status: constanta.Status200,
+		Data:   accessTokenResponse,
+	}
+
+	helper.WriteToResponseBodyWithCookie(w, cookie, webResponse)
 }

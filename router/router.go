@@ -23,6 +23,7 @@ func NewRouter(oauth2Controller controller.OAuth2Controller,
 	router.HandleFunc("/oauth/access_token", oauth2Controller.AccessToken).Methods(http.MethodPost)
 	router.HandleFunc("/oauth/refresh_token", oauth2Controller.RefreshToken).Methods(http.MethodPost)
 	router.HandleFunc("/oauth/revoke_refresh_token", oauth2Controller.RevokeRefreshToken).Methods(http.MethodPost)
+	router.HandleFunc("/login", oauth2Controller.InternalLogin).Methods(http.MethodGet, http.MethodPost)
 
 	router.HandleFunc("/api/user", userController.FindAll).Methods(http.MethodGet)
 	router.HandleFunc("/api/user", userController.Create).Methods(http.MethodPost)

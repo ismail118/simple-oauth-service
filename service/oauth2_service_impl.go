@@ -78,7 +78,7 @@ func (service *OAuth2ServiceImpl) Login(ctx context.Context, request request.Log
 	dataContext, err := ctx2.NewContext(userResponse, userRoleResponse, dataScopesResponse)
 	helper.PanicIfError(err)
 
-	accessTokenClaims := helper.NewMyCustomClaims(dataContext, strconv.FormatInt(user.Id, 10), "access token", time.Duration(30)*time.Minute)
+	accessTokenClaims := helper.NewMyCustomClaims(dataContext, strconv.FormatInt(user.Id, 10), "access token", time.Duration(24)*time.Hour)
 	refreshTokenClaims := helper.NewMyCustomClaims(dataContext, strconv.FormatInt(user.Id, 10), "refresh token", time.Duration(24*7)*time.Hour)
 
 	accessTokenStr, err := helper.GenerateJwtToken(accessTokenClaims, constanta.SecretKey)
@@ -115,8 +115,7 @@ func (service *OAuth2ServiceImpl) AccessToken(ctx context.Context, request reque
 		helper.PanicIfError(errors.NewValidationErrors(constanta.ClientNotFound))
 	}
 
-	err = helper.CompareHasPassword(client.ClientSecret, request.ClientSecret)
-	if err != nil {
+	if client.ClientSecret != request.ClientSecret {
 		helper.PanicIfError(errors.NewUnauthorizedError(constanta.WrongClientSecret))
 	}
 
@@ -158,7 +157,7 @@ func (service *OAuth2ServiceImpl) RefreshToken(ctx context.Context, c *http.Cook
 		panic(errors.NewUnauthorizedError(constanta.InvalidToken))
 	}
 
-	accessTokenClaims := helper.NewMyCustomClaims(refreshTokenClaim.Context, "access token", "token", time.Duration(30)*time.Minute)
+	accessTokenClaims := helper.NewMyCustomClaims(refreshTokenClaim.Context, "access token", "token", time.Duration(24)*time.Hour)
 	refreshTokenClaims := helper.NewMyCustomClaims(refreshTokenClaim.Context, "refresh token", "token", time.Duration(24*7)*time.Hour)
 
 	accessTokenStr, err := helper.GenerateJwtToken(accessTokenClaims, constanta.SecretKey)
@@ -196,4 +195,52 @@ func (service *OAuth2ServiceImpl) RevokeRefreshToken(ctx context.Context, reques
 	}
 
 	service.OauthRepository.UpdateUserTokenVersion(ctx, tx, request.UserId, user.TokenVersion)
+}
+
+func (service *OAuth2ServiceImpl) InternalLogin(ctx context.Context, request request.LoginRequest) (response.AccessTokenResponse, *http.Cookie) {
+	err := service.Validator.Struct(request)
+	helper.PanicIfError(err)
+
+	tx, err := service.DB.Begin()
+	helper.PanicIfError(err)
+	defer helper.CommitOrRollback(tx)
+
+	user, err := service.OauthRepository.FindUserByEmail(ctx, tx, request.Email)
+	if err != nil {
+		panic(errors.NewValidationErrors(constanta.UserNotFound))
+	}
+
+	if err := helper.CompareHasPassword(user.Password, request.Password); err != nil {
+		panic(errors.NewValidationErrors(constanta.WrongPassword))
+	}
+
+	dataContextModel, err := service.OauthRepository.FindDataContextByUserId(ctx, tx, user.Id)
+	if err != nil {
+		panic(errors.NewNotFoundError(constanta.DataContextNotFound))
+	}
+
+	userResponse := helper.ToUserResponse(dataContextModel.User)
+	userRoleResponse := helper.ToUserRoleResponse(dataContextModel.UserRole)
+	dataScopesResponse := helper.ToDataScopeResponses(dataContextModel.DataScopes)
+
+	dataContext, err := ctx2.NewContext(userResponse, userRoleResponse, dataScopesResponse)
+	helper.PanicIfError(err)
+
+	accessTokenClaims := helper.NewMyCustomClaims(dataContext, strconv.FormatInt(user.Id, 10), "access token", time.Duration(24)*time.Hour)
+	refreshTokenClaims := helper.NewMyCustomClaims(dataContext, strconv.FormatInt(user.Id, 10), "refresh token", time.Duration(24*7)*time.Hour)
+
+	accessTokenStr, err := helper.GenerateJwtToken(accessTokenClaims, constanta.SecretKey)
+	helper.PanicIfError(err)
+	refreshTokenStr, err := helper.GenerateJwtToken(refreshTokenClaims, constanta.SecretKey)
+	helper.PanicIfError(err)
+	panic("")
+
+	cookie := &http.Cookie{
+		Name:  "jid",
+		Value: refreshTokenStr,
+	}
+
+	return response.AccessTokenResponse{
+		AccessToken: accessTokenStr,
+	}, cookie
 }

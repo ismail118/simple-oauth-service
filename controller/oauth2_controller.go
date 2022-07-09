@@ -10,4 +10,5 @@ type OAuth2Controller interface {
 	AccessToken(w http.ResponseWriter, r *http.Request)
 	RefreshToken(w http.ResponseWriter, r *http.Request)
 	RevokeRefreshToken(w http.ResponseWriter, r *http.Request)
+	InternalLogin(w http.ResponseWriter, r *http.Request)
 }

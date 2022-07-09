@@ -44,6 +44,16 @@ func AuthorizationHandler(next http.Handler) http.Handler {
 			},
 			{
 				Method:      "POST",
+				Url:         "/login",
+				IsUrlPrefix: true,
+			},
+			{
+				Method:      "GET",
+				Url:         "/login",
+				IsUrlPrefix: true,
+			},
+			{
+				Method:      "POST",
 				Url:         "/oauth/login/",
 				IsUrlPrefix: true,
 			},
