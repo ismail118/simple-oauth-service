@@ -42,11 +42,7 @@ func (service *UserServiceImpl) FindAll(ctx ctx.Context, roles ...string) []resp
 	err := helper.CheckRoles(ctx, roles...)
 	helper.PanicIfError(err)
 
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	users := service.UserRepository.FindAll(ctx, tx)
+	users := service.UserRepository.FindAll(ctx, service.DB)
 
 	return helper.ToUserResponses(users)
 }
@@ -55,11 +51,7 @@ func (service *UserServiceImpl) FindById(ctx ctx.Context, userId int64, roles ..
 	err := helper.CheckRoles(ctx, roles...)
 	helper.PanicIfError(err)
 
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	user, err := service.UserRepository.FindById(ctx, tx, userId)
+	user, err := service.UserRepository.FindById(ctx, service.DB, userId)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.UserNotFound))
 	}
@@ -77,12 +69,12 @@ func (service *UserServiceImpl) Create(ctx context.Context, request request.User
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	_, err = service.UserRepository.FindByEmail(ctx, tx, request.Email)
+	_, err = service.UserRepository.FindByEmail(ctx, service.DB, request.Email)
 	if err == nil {
 		helper.PanicIfError(errors.NewValidationErrors(constanta.SomeoneAlreadyUseThisEmail))
 	}
 
-	userRole, err := service.UserRoleRepository.FindById(ctx, tx, request.UserRoleId)
+	userRole, err := service.UserRoleRepository.FindById(ctx, service.DB, request.UserRoleId)
 	if err != nil {
 		helper.PanicIfError(errors.NewValidationErrors(constanta.UserRoleNotFound))
 	}
@@ -144,7 +136,7 @@ func (service *UserServiceImpl) Update(ctx ctx.Context, request request.UserUpda
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	user, err := service.UserRepository.FindById(ctx, tx, request.Id)
+	user, err := service.UserRepository.FindById(ctx, service.DB, request.Id)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.UserNotFound))
 	}
@@ -182,7 +174,7 @@ func (service *UserServiceImpl) Delete(ctx ctx.Context, userId int64, roles ...s
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	user, err := service.UserRepository.FindById(ctx, tx, userId)
+	user, err := service.UserRepository.FindById(ctx, service.DB, userId)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.UserNotFound))
 	}
@@ -207,7 +199,7 @@ func (service *UserServiceImpl) Validate(ctx context.Context, request request.Va
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	user, err := service.UserRepository.FindByEmail(ctx, tx, email)
+	user, err := service.UserRepository.FindByEmail(ctx, service.DB, email)
 	helper.PanicIfError(err)
 
 	user = domain.UserModel{
@@ -248,7 +240,7 @@ func (service *UserServiceImpl) ChangePassword(ctx ctx.Context, request request.
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	user, err := service.UserRepository.FindById(ctx, tx, request.Id)
+	user, err := service.UserRepository.FindById(ctx, service.DB, request.Id)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.UserNotFound))
 	}

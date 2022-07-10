@@ -15,7 +15,7 @@ func NewUserRepository() UserRepository {
 	return &UserRepositoryImpl{}
 }
 
-func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.UserModel {
+func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.DB) []domain.UserModel {
 	querySql := "SELECT id, email, password, first_name, last_name, user_role_id, company_id, principal_id, distributor_id, buyer_id, is_verified, is_delete, created_at, updated_at, created_by, updated_by FROM user"
 
 	rows, err := tx.QueryContext(ctx, querySql)
@@ -51,10 +51,11 @@ func (repository *UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) [
 	return users
 }
 
-func (repository *UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, userId int64) (domain.UserModel, error) {
+func (repository *UserRepositoryImpl) FindById(ctx context.Context, db *sql.DB, userId int64) (domain.UserModel, error) {
 	querySql := "SELECT id, email, password, first_name, last_name, user_role_id, company_id, principal_id, distributor_id, buyer_id, is_verified, is_delete, created_at, updated_at, created_by, updated_by FROM user WHERE id = ?"
 
-	rows, err := tx.QueryContext(ctx, querySql, userId)
+	conn, err := db.Conn(ctx)
+	rows, err := conn.QueryContext(ctx, querySql, userId)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
@@ -149,10 +150,11 @@ func (repository *UserRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, us
 	helper.PanicIfError(err)
 }
 
-func (repository *UserRepositoryImpl) FindByEmail(ctx context.Context, tx *sql.Tx, email string) (domain.UserModel, error) {
+func (repository *UserRepositoryImpl) FindByEmail(ctx context.Context, db *sql.DB, email string) (domain.UserModel, error) {
 	querySql := "SELECT id, email, password, first_name, last_name, user_role_id, company_id, principal_id, distributor_id, buyer_id, token_version, is_verified, is_delete, created_at, updated_at, created_by, updated_by FROM user WHERE email = ?"
 
-	rows, err := tx.QueryContext(ctx, querySql, email)
+	conn, err := db.Conn(ctx)
+	rows, err := conn.QueryContext(ctx, querySql, email)
 	helper.PanicIfError(err)
 	defer rows.Close()
 

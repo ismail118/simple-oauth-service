@@ -32,11 +32,7 @@ func (service *UserRoleServiceImpl) FindAll(ctx ctx.Context, roles ...string) []
 	err := helper.CheckRoles(ctx, roles...)
 	helper.PanicIfError(err)
 
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	userRoles := service.UserRoleRepository.FindAll(ctx, tx)
+	userRoles := service.UserRoleRepository.FindAll(ctx, service.DB)
 
 	return helper.ToUserRoleResponses(userRoles)
 }
@@ -45,11 +41,7 @@ func (service *UserRoleServiceImpl) FindById(ctx ctx.Context, userRoleId int64, 
 	err := helper.CheckRoles(ctx, roles...)
 	helper.PanicIfError(err)
 
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	userRole, err := service.UserRoleRepository.FindById(ctx, tx, userRoleId)
+	userRole, err := service.UserRoleRepository.FindById(ctx, service.DB, userRoleId)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.UserRoleNotFound))
 	}
@@ -89,7 +81,7 @@ func (service *UserRoleServiceImpl) Update(ctx ctx.Context, request request.User
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	userRole, err := service.UserRoleRepository.FindById(ctx, tx, request.Id)
+	userRole, err := service.UserRoleRepository.FindById(ctx, service.DB, request.Id)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.UserRoleNotFound))
 	}
@@ -113,7 +105,7 @@ func (service *UserRoleServiceImpl) Delete(ctx ctx.Context, userRoleId int64, ro
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	userRole, err := service.UserRoleRepository.FindById(ctx, tx, userRoleId)
+	userRole, err := service.UserRoleRepository.FindById(ctx, service.DB, userRoleId)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.UserRoleNotFound))
 	}

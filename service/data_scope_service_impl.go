@@ -11,7 +11,6 @@ import (
 	"simple-oauth-service/model/request"
 	"simple-oauth-service/model/response"
 	"simple-oauth-service/repository"
-	"strconv"
 	"time"
 )
 
@@ -33,11 +32,7 @@ func (service *DataScopeServiceImpl) FindAll(ctx ctx.Context, roles ...string) [
 	err := helper.CheckRoles(ctx, roles...)
 	helper.PanicIfError(err)
 
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	dataScopes := service.DataScopeRepository.FindAll(ctx, tx)
+	dataScopes := service.DataScopeRepository.FindAll(ctx, service.DB)
 
 	return helper.ToDataScopeResponses(dataScopes)
 }
@@ -46,11 +41,7 @@ func (service *DataScopeServiceImpl) FindById(ctx ctx.Context, dataScopeId int64
 	err := helper.CheckRoles(ctx, roles...)
 	helper.PanicIfError(err)
 
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	dataScope, err := service.DataScopeRepository.FindById(ctx, tx, dataScopeId)
+	dataScope, err := service.DataScopeRepository.FindById(ctx, service.DB, dataScopeId)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.DataScopeNotFound))
 	}
@@ -76,8 +67,8 @@ func (service *DataScopeServiceImpl) Create(ctx ctx.Context, request request.Dat
 		IsDelete:      false,
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
-		CreatedBy:     strconv.FormatInt(ctx.User.Id, 10),
-		UpdatedBy:     strconv.FormatInt(ctx.User.Id, 10),
+		CreatedBy:     ctx.User.Email,
+		UpdatedBy:     ctx.User.Email,
 	}
 
 	dataScope = service.DataScopeRepository.Save(ctx, tx, dataScope)
@@ -96,7 +87,7 @@ func (service *DataScopeServiceImpl) Update(ctx ctx.Context, request request.Dat
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	dataScope, err := service.DataScopeRepository.FindById(ctx, tx, request.Id)
+	dataScope, err := service.DataScopeRepository.FindById(ctx, service.DB, request.Id)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.DataScopeNotFound))
 	}
@@ -111,7 +102,7 @@ func (service *DataScopeServiceImpl) Update(ctx ctx.Context, request request.Dat
 		CreatedAt:     dataScope.CreatedAt,
 		UpdatedAt:     time.Now(),
 		CreatedBy:     dataScope.CreatedBy,
-		UpdatedBy:     strconv.FormatInt(ctx.User.Id, 10),
+		UpdatedBy:     ctx.User.Email,
 	}
 
 	dataScope = service.DataScopeRepository.Update(ctx, tx, dataScope)
@@ -127,7 +118,7 @@ func (service *DataScopeServiceImpl) Delete(ctx ctx.Context, dataScopeId int64, 
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	dataScope, err := service.DataScopeRepository.FindById(ctx, tx, dataScopeId)
+	dataScope, err := service.DataScopeRepository.FindById(ctx, service.DB, dataScopeId)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.DataScopeNotFound))
 	}

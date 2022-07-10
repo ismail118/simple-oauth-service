@@ -16,9 +16,11 @@ func NewUserRoleRepository() UserRoleRepository {
 	return &UserRoleRepositoryImpl{}
 }
 
-func (repository *UserRoleRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.UserRoleModel {
+func (repository *UserRoleRepositoryImpl) FindAll(ctx context.Context, db *sql.DB) []domain.UserRoleModel {
 	querySql := "SELECT id, role, created_at FROM user_role"
-	rows, err := tx.QueryContext(ctx, querySql)
+
+	conn, err := db.Conn(ctx)
+	rows, err := conn.QueryContext(ctx, querySql)
 	defer rows.Close()
 	helper.PanicIfError(err)
 
@@ -37,10 +39,11 @@ func (repository *UserRoleRepositoryImpl) FindAll(ctx context.Context, tx *sql.T
 	return userRoles
 }
 
-func (repository *UserRoleRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, userRoleId int64) (domain.UserRoleModel, error) {
-	querySql := "SELECT id, role, created_at WHERE id = ?"
+func (repository *UserRoleRepositoryImpl) FindById(ctx context.Context, db *sql.DB, userRoleId int64) (domain.UserRoleModel, error) {
+	querySql := "SELECT id, role, created_at FROM user_role WHERE id = ?"
 
-	row, err := tx.QueryContext(ctx, querySql, userRoleId)
+	conn, err := db.Conn(ctx)
+	row, err := conn.QueryContext(ctx, querySql, userRoleId)
 	helper.PanicIfError(err)
 
 	var userRole domain.UserRoleModel

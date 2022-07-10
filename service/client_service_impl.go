@@ -11,7 +11,6 @@ import (
 	"simple-oauth-service/model/request"
 	"simple-oauth-service/model/response"
 	"simple-oauth-service/repository"
-	"strconv"
 	"time"
 )
 
@@ -33,11 +32,7 @@ func (service *ClientServiceImpl) FindAll(ctx ctx.Context, roles ...string) []re
 	err := helper.CheckRoles(ctx, roles...)
 	helper.PanicIfError(err)
 
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	clients := service.ClientRepository.FindAll(ctx, tx)
+	clients := service.ClientRepository.FindAll(ctx, service.DB)
 
 	return helper.ToClientResponses(clients)
 }
@@ -46,11 +41,7 @@ func (service *ClientServiceImpl) FindById(ctx ctx.Context, clientId int64, role
 	err := helper.CheckRoles(ctx, roles...)
 	helper.PanicIfError(err)
 
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	client, err := service.ClientRepository.FindById(ctx, tx, clientId)
+	client, err := service.ClientRepository.FindById(ctx, service.DB, clientId)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.ClientNotFound))
 	}
@@ -76,8 +67,8 @@ func (service *ClientServiceImpl) Create(ctx ctx.Context, request request.Client
 		IsDelete:        false,
 		CreatedAt:       time.Now(),
 		UpdatedAt:       time.Now(),
-		CreatedBy:       strconv.FormatInt(ctx.User.Id, 10),
-		UpdatedBy:       strconv.FormatInt(ctx.User.Id, 10),
+		CreatedBy:       ctx.User.Email,
+		UpdatedBy:       ctx.User.Email,
 	}
 
 	client = service.ClientRepository.Save(ctx, tx, client)
@@ -96,7 +87,7 @@ func (service *ClientServiceImpl) Update(ctx ctx.Context, request request.Client
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	client, err := service.ClientRepository.FindById(ctx, tx, request.Id)
+	client, err := service.ClientRepository.FindById(ctx, service.DB, request.Id)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.ClientNotFound))
 	}
@@ -110,7 +101,7 @@ func (service *ClientServiceImpl) Update(ctx ctx.Context, request request.Client
 		CreatedAt:       client.CreatedAt,
 		UpdatedAt:       time.Now(),
 		CreatedBy:       client.CreatedBy,
-		UpdatedBy:       strconv.FormatInt(ctx.User.Id, 10),
+		UpdatedBy:       ctx.User.Email,
 	}
 
 	client = service.ClientRepository.Update(ctx, tx, client)
@@ -126,7 +117,7 @@ func (service *ClientServiceImpl) Delete(ctx ctx.Context, clientId int64, roles 
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	client, err := service.ClientRepository.FindById(ctx, tx, clientId)
+	client, err := service.ClientRepository.FindById(ctx, service.DB, clientId)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.ClientNotFound))
 	}

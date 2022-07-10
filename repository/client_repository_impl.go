@@ -15,9 +15,10 @@ func NewClientRepository() ClientRepository {
 	return &ClientRepositoryImpl{}
 }
 
-func (repository *ClientRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, clientId int64) (domain.ClientModel, error) {
+func (repository *ClientRepositoryImpl) FindById(ctx context.Context, db *sql.DB, clientId int64) (domain.ClientModel, error) {
 	querySql := "SELECT id, user_id, application_name, client_secret, is_delete, created_at, updated_at, created_by, updated_by FROM client WHERE id = ?"
-	rows, err := tx.QueryContext(ctx, querySql, clientId)
+	conn, err := db.Conn(ctx)
+	rows, err := conn.QueryContext(ctx, querySql, clientId)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
@@ -44,9 +45,10 @@ func (repository *ClientRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx
 	}
 }
 
-func (repository *ClientRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.ClientModel {
+func (repository *ClientRepositoryImpl) FindAll(ctx context.Context, db *sql.DB) []domain.ClientModel {
 	querySql := "SELECT id, user_id, application_name, client_secret, is_delete, created_at, updated_at, created_by, updated_by FROM client"
-	rows, err := tx.QueryContext(ctx, querySql)
+	conn, err := db.Conn(ctx)
+	rows, err := conn.QueryContext(ctx, querySql)
 	helper.PanicIfError(err)
 	defer rows.Close()
 

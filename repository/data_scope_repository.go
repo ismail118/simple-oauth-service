@@ -7,8 +7,8 @@ import (
 )
 
 type DataScopeRepository interface {
-	FindAll(ctx context.Context, tx *sql.Tx) []domain.DataScopeModel
-	FindById(ctx context.Context, tx *sql.Tx, dataScopeId int64) (domain.DataScopeModel, error)
+	FindAll(ctx context.Context, db *sql.DB) []domain.DataScopeModel
+	FindById(ctx context.Context, db *sql.DB, dataScopeId int64) (domain.DataScopeModel, error)
 	Save(ctx context.Context, tx *sql.Tx, dataScope domain.DataScopeModel) domain.DataScopeModel
 	Update(ctx context.Context, tx *sql.Tx, dataScope domain.DataScopeModel) domain.DataScopeModel
 	Delete(ctx context.Context, tx *sql.Tx, dataScope domain.DataScopeModel)

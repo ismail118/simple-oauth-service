@@ -18,7 +18,7 @@ import (
 )
 
 func NewDBTest() *sql.DB {
-	db, err := sql.Open("mysql", "root:Colonelgila123@tcp(localhost:3306)/auth_test?parseTime=true")
+	db, err := sql.Open("mysql", "root:Colonelgila123@tcp(localhost:3306)/auth?parseTime=true")
 	helper.PanicIfError(err)
 
 	db.SetMaxIdleConns(10)

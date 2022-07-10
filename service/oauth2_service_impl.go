@@ -39,11 +39,7 @@ func (service *OAuth2ServiceImpl) Authorize(ctx context.Context, request request
 	err := service.Validator.Struct(request)
 	helper.PanicIfError(err)
 
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	_, err = service.OauthRepository.FindClientById(ctx, tx, request.ClientId)
+	_, err = service.OauthRepository.FindClientById(ctx, service.DB, request.ClientId)
 	helper.PanicIfError(err)
 }
 
@@ -51,22 +47,22 @@ func (service *OAuth2ServiceImpl) Login(ctx context.Context, request request.Log
 	err := service.Validator.Struct(request)
 	helper.PanicIfError(err)
 
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	user, err := service.OauthRepository.FindUserByEmail(ctx, tx, request.Email)
+	user, err := service.OauthRepository.FindUserByEmail(ctx, service.DB, request.Email)
 	if err != nil {
 		panic(errors.NewValidationErrors(constanta.UserNotFound))
 	}
 
-	if err := helper.CompareHasPassword(user.Password, request.Password); err != nil {
+	if !user.IsVerified {
+		panic(errors.NewForbiddenError(constanta.UserInactive))
+	}
+
+	if err = helper.CompareHasPassword(user.Password, request.Password); err != nil {
 		panic(errors.NewValidationErrors(constanta.WrongPassword))
 	}
 
 	code := helper.RandStringBytes(12)
 
-	dataContextModel, err := service.OauthRepository.FindDataContextByUserId(ctx, tx, user.Id)
+	dataContextModel, err := service.OauthRepository.FindDataContextByUserId(ctx, service.DB, user.Id)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.DataContextNotFound))
 	}
@@ -106,11 +102,7 @@ func (service *OAuth2ServiceImpl) AccessToken(ctx context.Context, request reque
 	err := service.Validator.Struct(request)
 	helper.PanicIfError(err)
 
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	client, err := service.OauthRepository.FindClientById(ctx, tx, request.ClientId)
+	client, err := service.OauthRepository.FindClientById(ctx, service.DB, request.ClientId)
 	if err != nil {
 		helper.PanicIfError(errors.NewValidationErrors(constanta.ClientNotFound))
 	}
@@ -146,11 +138,7 @@ func (service *OAuth2ServiceImpl) RefreshToken(ctx context.Context, c *http.Cook
 	refreshTokenClaim, err := helper.ParseJwtTokenToClaims(c.Value, constanta.SecretKey)
 	helper.PanicIfError(err)
 
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	user, err := service.OauthRepository.FindUserById(refreshTokenClaim.Context, tx, refreshTokenClaim.Context.User.Id)
+	user, err := service.OauthRepository.FindUserById(refreshTokenClaim.Context, service.DB, refreshTokenClaim.Context.User.Id)
 	helper.PanicIfError(err)
 
 	if user.TokenVersion != refreshTokenClaim.Context.User.TokenVersion {
@@ -183,7 +171,7 @@ func (service *OAuth2ServiceImpl) RevokeRefreshToken(ctx context.Context, reques
 	helper.PanicIfError(err)
 	defer helper.CommitOrRollback(tx)
 
-	user, err := service.OauthRepository.FindUserById(ctx, tx, request.UserId)
+	user, err := service.OauthRepository.FindUserById(ctx, service.DB, request.UserId)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.UserNotFound))
 	}
@@ -201,20 +189,20 @@ func (service *OAuth2ServiceImpl) InternalLogin(ctx context.Context, request req
 	err := service.Validator.Struct(request)
 	helper.PanicIfError(err)
 
-	tx, err := service.DB.Begin()
-	helper.PanicIfError(err)
-	defer helper.CommitOrRollback(tx)
-
-	user, err := service.OauthRepository.FindUserByEmail(ctx, tx, request.Email)
+	user, err := service.OauthRepository.FindUserByEmail(ctx, service.DB, request.Email)
 	if err != nil {
 		panic(errors.NewValidationErrors(constanta.UserNotFound))
+	}
+
+	if !user.IsVerified {
+		panic(errors.NewForbiddenError(constanta.UserInactive))
 	}
 
 	if err := helper.CompareHasPassword(user.Password, request.Password); err != nil {
 		panic(errors.NewValidationErrors(constanta.WrongPassword))
 	}
 
-	dataContextModel, err := service.OauthRepository.FindDataContextByUserId(ctx, tx, user.Id)
+	dataContextModel, err := service.OauthRepository.FindDataContextByUserId(ctx, service.DB, user.Id)
 	if err != nil {
 		panic(errors.NewNotFoundError(constanta.DataContextNotFound))
 	}

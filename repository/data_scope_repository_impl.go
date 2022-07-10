@@ -15,10 +15,11 @@ func NewDataScopeRepository() DataScopeRepository {
 	return &DataScopeRepositoryImpl{}
 }
 
-func (repository *DataScopeRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.DataScopeModel {
+func (repository *DataScopeRepositoryImpl) FindAll(ctx context.Context, db *sql.DB) []domain.DataScopeModel {
 	querySql := "SELECT id, user_id, principal_id, distributor_id, buyer_id, is_delete, created_at, updated_at, created_by, updated_by FROM data_scope"
 
-	rows, err := tx.QueryContext(ctx, querySql)
+	conn, err := db.Conn(ctx)
+	rows, err := conn.QueryContext(ctx, querySql)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
@@ -44,10 +45,11 @@ func (repository *DataScopeRepositoryImpl) FindAll(ctx context.Context, tx *sql.
 
 	return dataScopes
 }
-func (repository *DataScopeRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, dataScopeId int64) (domain.DataScopeModel, error) {
+func (repository *DataScopeRepositoryImpl) FindById(ctx context.Context, db *sql.DB, dataScopeId int64) (domain.DataScopeModel, error) {
 	querySql := "SELECT id, user_id, principal_id, distributor_id, buyer_id, is_delete, created_at, updated_at, created_by, updated_by FROM data_scope WHERE id = ?"
 
-	rows, err := tx.QueryContext(ctx, querySql, dataScopeId)
+	conn, err := db.Conn(ctx)
+	rows, err := conn.QueryContext(ctx, querySql, dataScopeId)
 	helper.PanicIfError(err)
 	defer rows.Close()
 
