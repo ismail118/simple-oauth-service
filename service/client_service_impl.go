@@ -61,14 +61,14 @@ func (service *ClientServiceImpl) Create(ctx ctx.Context, request request.Client
 	defer helper.CommitOrRollback(tx)
 
 	client := domain.ClientModel{
-		ApplicationName: request.ApplicationName,
-		UserId:          ctx.User.Id,
-		ClientSecret:    helper.RandStringBytes(15),
-		IsDelete:        false,
-		CreatedAt:       time.Now(),
-		UpdatedAt:       time.Now(),
-		CreatedBy:       ctx.User.Email,
-		UpdatedBy:       ctx.User.Email,
+		ApplicationName: sql.NullString{String: request.ApplicationName},
+		UserId:          sql.NullInt64{Int64: ctx.User.Id},
+		ClientSecret:    sql.NullString{String: helper.RandStringBytes(15)},
+		IsDelete:        sql.NullBool{Bool: false},
+		CreatedAt:       sql.NullTime{Time: time.Now()},
+		UpdatedAt:       sql.NullTime{Time: time.Now()},
+		CreatedBy:       sql.NullString{String: ctx.User.Email},
+		UpdatedBy:       sql.NullString{String: ctx.User.Email},
 	}
 
 	client = service.ClientRepository.Save(ctx, tx, client)
@@ -95,13 +95,13 @@ func (service *ClientServiceImpl) Update(ctx ctx.Context, request request.Client
 	client = domain.ClientModel{
 		Id:              client.Id,
 		UserId:          client.UserId,
-		ApplicationName: request.ApplicationName,
+		ApplicationName: sql.NullString{String: request.ApplicationName},
 		ClientSecret:    client.ClientSecret,
-		IsDelete:        request.IsDelete,
+		IsDelete:        sql.NullBool{Bool: request.IsDelete},
 		CreatedAt:       client.CreatedAt,
-		UpdatedAt:       time.Now(),
+		UpdatedAt:       sql.NullTime{Time: time.Now()},
 		CreatedBy:       client.CreatedBy,
-		UpdatedBy:       ctx.User.Email,
+		UpdatedBy:       sql.NullString{String: ctx.User.Email},
 	}
 
 	client = service.ClientRepository.Update(ctx, tx, client)

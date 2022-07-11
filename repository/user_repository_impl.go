@@ -55,6 +55,7 @@ func (repository *UserRepositoryImpl) FindById(ctx context.Context, db *sql.DB, 
 	querySql := "SELECT id, email, password, first_name, last_name, user_role_id, company_id, principal_id, distributor_id, buyer_id, is_verified, is_delete, created_at, updated_at, created_by, updated_by FROM user WHERE id = ?"
 
 	conn, err := db.Conn(ctx)
+	helper.PanicIfError(err)
 	rows, err := conn.QueryContext(ctx, querySql, userId)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -113,7 +114,7 @@ func (repository *UserRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, user
 	id, err := result.LastInsertId()
 	helper.PanicIfError(err)
 
-	user.Id = id
+	user.Id.Int64 = id
 	return user
 }
 
@@ -154,6 +155,7 @@ func (repository *UserRepositoryImpl) FindByEmail(ctx context.Context, db *sql.D
 	querySql := "SELECT id, email, password, first_name, last_name, user_role_id, company_id, principal_id, distributor_id, buyer_id, token_version, is_verified, is_delete, created_at, updated_at, created_by, updated_by FROM user WHERE email = ?"
 
 	conn, err := db.Conn(ctx)
+	helper.PanicIfError(err)
 	rows, err := conn.QueryContext(ctx, querySql, email)
 	helper.PanicIfError(err)
 	defer rows.Close()

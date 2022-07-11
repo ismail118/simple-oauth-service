@@ -17,7 +17,9 @@ func NewClientRepository() ClientRepository {
 
 func (repository *ClientRepositoryImpl) FindById(ctx context.Context, db *sql.DB, clientId int64) (domain.ClientModel, error) {
 	querySql := "SELECT id, user_id, application_name, client_secret, is_delete, created_at, updated_at, created_by, updated_by FROM client WHERE id = ?"
+
 	conn, err := db.Conn(ctx)
+	helper.PanicIfError(err)
 	rows, err := conn.QueryContext(ctx, querySql, clientId)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -47,7 +49,9 @@ func (repository *ClientRepositoryImpl) FindById(ctx context.Context, db *sql.DB
 
 func (repository *ClientRepositoryImpl) FindAll(ctx context.Context, db *sql.DB) []domain.ClientModel {
 	querySql := "SELECT id, user_id, application_name, client_secret, is_delete, created_at, updated_at, created_by, updated_by FROM client"
+
 	conn, err := db.Conn(ctx)
+	helper.PanicIfError(err)
 	rows, err := conn.QueryContext(ctx, querySql)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -92,7 +96,7 @@ func (repository *ClientRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, cl
 	helper.PanicIfError(err)
 
 	id, err := result.LastInsertId()
-	client.Id = id
+	client.Id.Int64 = id
 	return client
 }
 

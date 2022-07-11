@@ -79,29 +79,29 @@ func (service *UserServiceImpl) Create(ctx context.Context, request request.User
 		helper.PanicIfError(errors.NewValidationErrors(constanta.UserRoleNotFound))
 	}
 
-	if userRole.Role == constanta.RoleAdmin {
+	if userRole.Role.String == constanta.RoleAdmin {
 		emailVerification = service.Dialer.Username
 	} else {
 		emailVerification = request.Email
 	}
 
 	user := domain.UserModel{
-		Email:         request.Email,
-		Password:      helper.HashAndSalt(request.Password),
-		FirstName:     request.FirstName,
-		LastName:      request.LastName,
-		UserRoleId:    request.UserRoleId,
-		CompanyId:     request.CompanyId,
-		PrincipalId:   request.PrincipalId,
-		DistributorId: request.DistributorId,
-		BuyerId:       request.BuyerId,
-		TokenVersion:  0,
-		IsVerified:    false,
-		IsDelete:      false,
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
-		CreatedBy:     request.Email,
-		UpdatedBy:     request.Email,
+		Email:         sql.NullString{String: request.Email},
+		Password:      sql.NullString{String: helper.HashAndSalt(request.Password)},
+		FirstName:     sql.NullString{String: request.FirstName},
+		LastName:      sql.NullString{String: request.LastName},
+		UserRoleId:    sql.NullInt64{Int64: request.UserRoleId},
+		CompanyId:     sql.NullInt64{Int64: request.CompanyId},
+		PrincipalId:   sql.NullInt64{Int64: request.PrincipalId},
+		DistributorId: sql.NullInt64{Int64: request.DistributorId},
+		BuyerId:       sql.NullInt64{Int64: request.BuyerId},
+		TokenVersion:  sql.NullInt64{Int64: 0},
+		IsVerified:    sql.NullBool{Bool: false},
+		IsDelete:      sql.NullBool{Bool: false},
+		CreatedAt:     sql.NullTime{Time: time.Now()},
+		UpdatedAt:     sql.NullTime{Time: time.Now()},
+		CreatedBy:     sql.NullString{String: request.Email},
+		UpdatedBy:     sql.NullString{String: request.Email},
 	}
 
 	user = service.UserRepository.Save(ctx, tx, user)
@@ -143,21 +143,21 @@ func (service *UserServiceImpl) Update(ctx ctx.Context, request request.UserUpda
 
 	user = domain.UserModel{
 		Id:            user.Id,
-		Email:         request.Email,
+		Email:         sql.NullString{String: request.Email},
 		Password:      user.Password,
-		FirstName:     request.FirstName,
-		LastName:      request.LastName,
-		UserRoleId:    request.UserRoleId,
-		CompanyId:     request.CompanyId,
-		PrincipalId:   request.PrincipalId,
-		DistributorId: request.DistributorId,
-		BuyerId:       request.BuyerId,
+		FirstName:     sql.NullString{String: request.FirstName},
+		LastName:      sql.NullString{String: request.LastName},
+		UserRoleId:    sql.NullInt64{Int64: request.UserRoleId},
+		CompanyId:     sql.NullInt64{Int64: request.CompanyId},
+		PrincipalId:   sql.NullInt64{Int64: request.PrincipalId},
+		DistributorId: sql.NullInt64{Int64: request.DistributorId},
+		BuyerId:       sql.NullInt64{Int64: request.BuyerId},
 		TokenVersion:  user.TokenVersion,
 		IsVerified:    user.IsVerified,
-		IsDelete:      request.IsDelete,
-		UpdatedAt:     time.Now(),
+		IsDelete:      sql.NullBool{Bool: request.IsDelete},
+		UpdatedAt:     sql.NullTime{Time: time.Now()},
 		CreatedAt:     user.CreatedAt,
-		UpdatedBy:     ctx.User.Email,
+		UpdatedBy:     sql.NullString{String: ctx.User.Email},
 		CreatedBy:     user.CreatedBy,
 	}
 
@@ -214,9 +214,9 @@ func (service *UserServiceImpl) Validate(ctx context.Context, request request.Va
 		DistributorId: user.DistributorId,
 		BuyerId:       user.BuyerId,
 		TokenVersion:  user.TokenVersion,
-		IsVerified:    true,
+		IsVerified:    sql.NullBool{Bool: true},
 		IsDelete:      user.IsDelete,
-		UpdatedAt:     time.Now(),
+		UpdatedAt:     sql.NullTime{Time: time.Now()},
 		CreatedAt:     user.CreatedAt,
 		UpdatedBy:     user.Email,
 		CreatedBy:     user.CreatedBy,
@@ -245,7 +245,7 @@ func (service *UserServiceImpl) ChangePassword(ctx ctx.Context, request request.
 		panic(errors.NewNotFoundError(constanta.UserNotFound))
 	}
 
-	err = helper.CompareHasPassword(user.Password, request.OldPassword)
+	err = helper.CompareHasPassword(user.Password.String, request.OldPassword)
 	if err != nil {
 		panic(errors.NewValidationErrors(constanta.WrongPassword))
 	}
@@ -253,7 +253,7 @@ func (service *UserServiceImpl) ChangePassword(ctx ctx.Context, request request.
 	user = domain.UserModel{
 		Id:            user.Id,
 		Email:         user.Email,
-		Password:      helper.HashAndSalt(request.NewPassword),
+		Password:      sql.NullString{String: helper.HashAndSalt(request.NewPassword)},
 		FirstName:     user.FirstName,
 		LastName:      user.LastName,
 		UserRoleId:    user.UserRoleId,
@@ -264,7 +264,7 @@ func (service *UserServiceImpl) ChangePassword(ctx ctx.Context, request request.
 		TokenVersion:  user.TokenVersion,
 		IsVerified:    user.IsVerified,
 		IsDelete:      user.IsDelete,
-		UpdatedAt:     time.Now(),
+		UpdatedAt:     sql.NullTime{Time: time.Now()},
 		CreatedAt:     user.CreatedAt,
 		UpdatedBy:     user.Email,
 		CreatedBy:     user.CreatedBy,

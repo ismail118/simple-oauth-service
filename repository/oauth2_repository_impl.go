@@ -19,6 +19,7 @@ func (repository *Oauth2RepositoryImpl) FindUserByEmail(ctx context.Context, db 
 	querySql := "SELECT id, email, password, first_name, last_name, user_role_id, company_id, principal_id, distributor_id, buyer_id, token_version, is_verified, is_delete, created_at, updated_at, created_by, updated_by FROM user WHERE email = ?"
 
 	conn, err := db.Conn(ctx)
+	helper.PanicIfError(err)
 	rows, err := conn.QueryContext(ctx, querySql, email)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -57,6 +58,7 @@ func (repository *Oauth2RepositoryImpl) FindUserById(ctx context.Context, db *sq
 	querySql := "SELECT id, email, password, first_name, last_name, user_role_id, company_id, principal_id, distributor_id, buyer_id, token_version, is_verified, is_delete, created_at, updated_at, created_by, updated_by FROM user WHERE id = ?"
 
 	conn, err := db.Conn(ctx)
+	helper.PanicIfError(err)
 	rows, err := conn.QueryContext(ctx, querySql, userId)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -123,15 +125,16 @@ func (repository *Oauth2RepositoryImpl) FindClientById(ctx context.Context, db *
 }
 
 func (repository *Oauth2RepositoryImpl) FindDataContextByUserId(ctx context.Context, db *sql.DB, userId int64) (domain.DataContextModel, error) {
-	querySql := "SELECT a.id, a.email, a.password, a.first_name, a.last_name, a.user_role_id, a.company_id, a.principal_id, a.distributor_id, a.buyer_id, a.token_version, a.is_verified, a.is_delete, a.created_at, a.updated_at, a.created_by, a.updated_by " +
-		" b.id, b.role, b.created_at " +
+	querySql := "SELECT a.id, a.email, a.password, a.first_name, a.last_name, a.user_role_id, a.company_id, a.principal_id, a.distributor_id, a.buyer_id, a.token_version, a.is_verified, a.is_delete, a.created_at, a.updated_at, a.created_by, a.updated_by, " +
+		" b.id, b.role, b.created_at, " +
 		" c.id, c.user_id, c.principal_id, c.distributor_id, c.buyer_id, c.is_delete, c.created_at, c.updated_at, c.created_by, c.updated_by " +
 		" FROM user AS a " +
 		" JOIN user_role AS b ON a.user_role_id = b.id " +
-		" JOIN data_scope AS c ON a.id = c.user_id " +
+		" LEFT JOIN data_scope AS c ON a.id = c.user_id " +
 		" WHERE a.id = ? "
 
 	conn, err := db.Conn(ctx)
+	helper.PanicIfError(err)
 	rows, err := conn.QueryContext(ctx, querySql, userId)
 	helper.PanicIfError(err)
 
@@ -139,54 +142,50 @@ func (repository *Oauth2RepositoryImpl) FindDataContextByUserId(ctx context.Cont
 	var userRole domain.UserRoleModel
 	var dataScopes []domain.DataScopeModel
 
-	if rows.Next() {
-		for rows.Next() {
-			var dataScope domain.DataScopeModel
-			err := rows.Scan(
-				&user.Id,
-				&user.Email,
-				&user.Password,
-				&user.FirstName,
-				&user.LastName,
-				&user.UserRoleId,
-				&user.CompanyId,
-				&user.PrincipalId,
-				&user.DistributorId,
-				&user.BuyerId,
-				&user.TokenVersion,
-				&user.IsVerified,
-				&user.IsDelete,
-				&user.CreatedAt,
-				&user.UpdatedAt,
-				&user.CreatedBy,
-				&user.UpdatedBy,
-				&userRole.Id,
-				&userRole.Role,
-				&userRole.CreatedAt,
-				&dataScope.Id,
-				&dataScope.UserId,
-				&dataScope.PrincipalId,
-				&dataScope.DistributorId,
-				&dataScope.BuyerId,
-				&dataScope.IsDelete,
-				&dataScope.CreatedAt,
-				&dataScope.UpdatedAt,
-				&dataScope.CreatedBy,
-				&dataScope.UpdatedBy,
-			)
-			helper.PanicIfError(err)
+	for rows.Next() {
+		var dataScope domain.DataScopeModel
+		err := rows.Scan(
+			&user.Id,
+			&user.Email,
+			&user.Password,
+			&user.FirstName,
+			&user.LastName,
+			&user.UserRoleId,
+			&user.CompanyId,
+			&user.PrincipalId,
+			&user.DistributorId,
+			&user.BuyerId,
+			&user.TokenVersion,
+			&user.IsVerified,
+			&user.IsDelete,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+			&user.CreatedBy,
+			&user.UpdatedBy,
+			&userRole.Id,
+			&userRole.Role,
+			&userRole.CreatedAt,
+			&dataScope.Id,
+			&dataScope.UserId,
+			&dataScope.PrincipalId,
+			&dataScope.DistributorId,
+			&dataScope.BuyerId,
+			&dataScope.IsDelete,
+			&dataScope.CreatedAt,
+			&dataScope.UpdatedAt,
+			&dataScope.CreatedBy,
+			&dataScope.UpdatedBy,
+		)
+		helper.PanicIfError(err)
 
-			dataScopes = append(dataScopes, dataScope)
-		}
-
-		return domain.DataContextModel{
-			User:       user,
-			UserRole:   userRole,
-			DataScopes: dataScopes,
-		}, nil
-	} else {
-		return domain.DataContextModel{}, errors.New("data not found")
+		dataScopes = append(dataScopes, dataScope)
 	}
+
+	return domain.DataContextModel{
+		User:       user,
+		UserRole:   userRole,
+		DataScopes: dataScopes,
+	}, nil
 }
 
 func (repository *Oauth2RepositoryImpl) UpdateUserTokenVersion(ctx context.Context, tx *sql.Tx, userId, tokenVersion int64) {

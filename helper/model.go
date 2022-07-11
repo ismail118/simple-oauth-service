@@ -7,22 +7,22 @@ import (
 
 func ToUserResponse(user domain.UserModel) response.UserResponse {
 	return response.UserResponse{
-		Id:            user.Id,
-		Email:         user.Email,
-		FirstName:     user.FirstName,
-		LastName:      user.LastName,
-		UserRoleId:    user.UserRoleId,
-		CompanyId:     user.CompanyId,
-		PrincipalId:   user.PrincipalId,
-		DistributorId: user.DistributorId,
-		BuyerId:       user.BuyerId,
-		TokenVersion:  user.TokenVersion,
-		IsVerified:    user.IsVerified,
-		IsDelete:      user.IsDelete,
-		CreatedAt:     user.CreatedAt,
-		UpdatedAt:     user.UpdatedAt,
-		CreatedBy:     user.CreatedBy,
-		UpdatedBy:     user.UpdatedBy,
+		Id:            user.Id.Int64,
+		Email:         user.Email.String,
+		FirstName:     user.FirstName.String,
+		LastName:      user.LastName.String,
+		UserRoleId:    user.UserRoleId.Int64,
+		CompanyId:     user.CompanyId.Int64,
+		PrincipalId:   user.PrincipalId.Int64,
+		DistributorId: user.DistributorId.Int64,
+		BuyerId:       user.BuyerId.Int64,
+		TokenVersion:  user.TokenVersion.Int64,
+		IsVerified:    user.IsVerified.Bool,
+		IsDelete:      user.IsDelete.Bool,
+		CreatedAt:     user.CreatedAt.Time,
+		UpdatedAt:     user.UpdatedAt.Time,
+		CreatedBy:     user.CreatedBy.String,
+		UpdatedBy:     user.UpdatedBy.String,
 	}
 }
 
@@ -37,15 +37,15 @@ func ToUserResponses(users []domain.UserModel) []response.UserResponse {
 
 func ToClientResponse(client domain.ClientModel) response.ClientResponse {
 	return response.ClientResponse{
-		Id:              client.Id,
-		UserId:          client.UserId,
-		ApplicationName: client.ApplicationName,
-		ClientSecret:    client.ClientSecret,
-		IsDelete:        client.IsDelete,
-		CreatedAt:       client.CreatedAt,
-		UpdatedAt:       client.UpdatedAt,
-		CreatedBy:       client.CreatedBy,
-		UpdatedBy:       client.UpdatedBy,
+		Id:              client.Id.Int64,
+		UserId:          client.UserId.Int64,
+		ApplicationName: client.ApplicationName.String,
+		ClientSecret:    client.ClientSecret.String,
+		IsDelete:        client.IsDelete.Bool,
+		CreatedAt:       client.CreatedAt.Time,
+		UpdatedAt:       client.UpdatedAt.Time,
+		CreatedBy:       client.CreatedBy.String,
+		UpdatedBy:       client.UpdatedBy.String,
 	}
 }
 
@@ -60,16 +60,16 @@ func ToClientResponses(clients []domain.ClientModel) []response.ClientResponse {
 
 func ToDataScopeResponse(dataScope domain.DataScopeModel) response.DataScopeResponse {
 	return response.DataScopeResponse{
-		Id:            dataScope.Id,
-		UserId:        dataScope.UserId,
-		PrincipalId:   dataScope.PrincipalId,
-		DistributorId: dataScope.DistributorId,
-		BuyerId:       dataScope.BuyerId,
-		IsDelete:      dataScope.IsDelete,
-		CreatedAt:     dataScope.CreatedAt,
-		UpdatedAt:     dataScope.UpdatedAt,
-		CreatedBy:     dataScope.CreatedBy,
-		UpdatedBy:     dataScope.UpdatedBy,
+		Id:            dataScope.Id.Int64,
+		UserId:        dataScope.UserId.Int64,
+		PrincipalId:   dataScope.PrincipalId.Int64,
+		DistributorId: dataScope.DistributorId.Int64,
+		BuyerId:       dataScope.BuyerId.Int64,
+		IsDelete:      dataScope.IsDelete.Bool,
+		CreatedAt:     dataScope.CreatedAt.Time,
+		UpdatedAt:     dataScope.UpdatedAt.Time,
+		CreatedBy:     dataScope.CreatedBy.String,
+		UpdatedBy:     dataScope.UpdatedBy.String,
 	}
 }
 
@@ -84,9 +84,9 @@ func ToDataScopeResponses(dataScopes []domain.DataScopeModel) []response.DataSco
 
 func ToUserRoleResponse(userRole domain.UserRoleModel) response.UserRoleResponse {
 	return response.UserRoleResponse{
-		Id:        userRole.Id,
-		Role:      userRole.Role,
-		CreatedAt: userRole.CreatedAt,
+		Id:        userRole.Id.Int64,
+		Role:      userRole.Role.String,
+		CreatedAt: userRole.CreatedAt.Time,
 	}
 }
 

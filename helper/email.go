@@ -23,7 +23,9 @@ func SendEmail(dialer *gomail.Dialer, message Message) {
 	mailer.SetHeader("Subject", message.Subject)
 	mailer.SetHeader("From", dialer.Username)
 	mailer.SetHeader("To", message.To...)
-	//mailer.SetAddressHeader("Cc", message.CC, "")
+	if message.CC != "" {
+		mailer.SetAddressHeader("Cc", message.CC, "")
+	}
 	mailer.SetBody("text/plain", message.BodyMessage)
 	if message.FilesAttach != nil {
 		for _, each := range message.FilesAttach {

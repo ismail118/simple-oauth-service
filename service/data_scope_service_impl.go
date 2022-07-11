@@ -61,14 +61,14 @@ func (service *DataScopeServiceImpl) Create(ctx ctx.Context, request request.Dat
 	defer helper.CommitOrRollback(tx)
 
 	dataScope := domain.DataScopeModel{
-		PrincipalId:   request.PrincipalId,
-		DistributorId: request.DistributorId,
-		BuyerId:       request.BuyerId,
-		IsDelete:      false,
-		CreatedAt:     time.Now(),
-		UpdatedAt:     time.Now(),
-		CreatedBy:     ctx.User.Email,
-		UpdatedBy:     ctx.User.Email,
+		PrincipalId:   sql.NullInt64{Int64: request.PrincipalId},
+		DistributorId: sql.NullInt64{Int64: request.DistributorId},
+		BuyerId:       sql.NullInt64{Int64: request.BuyerId},
+		IsDelete:      sql.NullBool{Bool: false},
+		CreatedAt:     sql.NullTime{Time: time.Now()},
+		UpdatedAt:     sql.NullTime{Time: time.Now()},
+		CreatedBy:     sql.NullString{String: ctx.User.Email},
+		UpdatedBy:     sql.NullString{String: ctx.User.Email},
 	}
 
 	dataScope = service.DataScopeRepository.Save(ctx, tx, dataScope)
@@ -93,16 +93,16 @@ func (service *DataScopeServiceImpl) Update(ctx ctx.Context, request request.Dat
 	}
 
 	dataScope = domain.DataScopeModel{
-		Id:            request.Id,
-		UserId:        request.UserId,
-		PrincipalId:   request.PrincipalId,
-		DistributorId: request.DistributorId,
-		BuyerId:       request.BuyerId,
-		IsDelete:      request.IsDelete,
+		Id:            sql.NullInt64{Int64: request.Id},
+		UserId:        sql.NullInt64{Int64: request.UserId},
+		PrincipalId:   sql.NullInt64{Int64: request.PrincipalId},
+		DistributorId: sql.NullInt64{Int64: request.DistributorId},
+		BuyerId:       sql.NullInt64{Int64: request.BuyerId},
+		IsDelete:      sql.NullBool{Bool: request.IsDelete},
 		CreatedAt:     dataScope.CreatedAt,
-		UpdatedAt:     time.Now(),
+		UpdatedAt:     sql.NullTime{Time: time.Now()},
 		CreatedBy:     dataScope.CreatedBy,
-		UpdatedBy:     ctx.User.Email,
+		UpdatedBy:     sql.NullString{String: ctx.User.Email},
 	}
 
 	dataScope = service.DataScopeRepository.Update(ctx, tx, dataScope)

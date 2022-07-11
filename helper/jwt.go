@@ -53,6 +53,6 @@ func ParseJwtTokenToClaims(tokenStr string, signingKey string) (*MyCustomClaims,
 	} else if errors.Is(err, jwt.ErrTokenExpired) || errors.Is(err, jwt.ErrTokenNotValidYet) {
 		return nil, errors2.NewUnauthorizedError(constanta.ExpiredToken)
 	} else {
-		return nil, err
+		return nil, errors2.NewUnauthorizedError(constanta.StatusUnauthorized)
 	}
 }

@@ -1,15 +1,17 @@
 package domain
 
-import "time"
+import (
+	"database/sql"
+)
 
 type ClientModel struct {
-	Id              int64
-	UserId          int64
-	ApplicationName string
-	ClientSecret    string
-	IsDelete        bool
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-	CreatedBy       string
-	UpdatedBy       string
+	Id              sql.NullInt64
+	UserId          sql.NullInt64
+	ApplicationName sql.NullString
+	ClientSecret    sql.NullString
+	IsDelete        sql.NullBool
+	CreatedAt       sql.NullTime
+	UpdatedAt       sql.NullTime
+	CreatedBy       sql.NullString
+	UpdatedBy       sql.NullString
 }

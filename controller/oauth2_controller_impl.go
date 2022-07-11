@@ -3,11 +3,13 @@ package controller
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gorilla/mux"
 	"html/template"
 	"net/http"
 	"simple-oauth-service/constanta"
+	errors2 "simple-oauth-service/errors"
 	"simple-oauth-service/helper"
 	"simple-oauth-service/model/request"
 	"simple-oauth-service/model/response"
@@ -46,12 +48,17 @@ func (controller *OAuth2ControllerImpl) Login(w http.ResponseWriter, r *http.Req
 	helper.PanicIfError(err)
 	redirectUrl := vars["redirectUrl"]
 
-	if r.Method != http.MethodPost {
+	isValidToken := helper.ValidateRefreshToken(r)
+
+	if r.Method != http.MethodPost && !isValidToken {
 		t, err2 := template.ParseFS(templates.Templates, "*.gohtml")
 		helper.PanicIfError(err2)
 
 		err2 = t.ExecuteTemplate(w, "login.gohtml", fmt.Sprintf("/oauth/login/%d/%s", clientId, redirectUrl))
 		helper.PanicIfError(err2)
+		return
+	} else if isValidToken {
+		http.Redirect(w, r, "/oauth/refresh_token", http.StatusPermanentRedirect)
 		return
 	}
 
@@ -94,7 +101,11 @@ func (controller *OAuth2ControllerImpl) AccessToken(w http.ResponseWriter, r *ht
 
 func (controller *OAuth2ControllerImpl) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	c, err := r.Cookie("jid")
-	helper.PanicIfError(err)
+	if err != nil && errors.Is(err, http.ErrNoCookie) {
+		panic(errors2.NewUnauthorizedError(constanta.StatusUnauthorized))
+	} else if err != nil {
+		helper.PanicIfError(err)
+	}
 
 	accessTokenResponse, cookie := controller.Oauth2Service.RefreshToken(r.Context(), c)
 
@@ -122,12 +133,17 @@ func (controller *OAuth2ControllerImpl) RevokeRefreshToken(w http.ResponseWriter
 }
 
 func (controller *OAuth2ControllerImpl) InternalLogin(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
+	isValidToken := helper.ValidateRefreshToken(r)
+
+	if r.Method != http.MethodPost && !isValidToken {
 		t, err2 := template.ParseFS(templates.Templates, "*.gohtml")
 		helper.PanicIfError(err2)
 
 		err2 = t.ExecuteTemplate(w, "login.gohtml", "/login")
 		helper.PanicIfError(err2)
+		return
+	} else if isValidToken {
+		http.Redirect(w, r, "/oauth/refresh_token", http.StatusPermanentRedirect)
 		return
 	}
 

@@ -1,16 +1,18 @@
 package domain
 
-import "time"
+import (
+	"database/sql"
+)
 
 type DataScopeModel struct {
-	Id            int64
-	UserId        int64
-	PrincipalId   int64
-	DistributorId int64
-	BuyerId       int64
-	IsDelete      bool
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	CreatedBy     string
-	UpdatedBy     string
+	Id            sql.NullInt64
+	UserId        sql.NullInt64
+	PrincipalId   sql.NullInt64
+	DistributorId sql.NullInt64
+	BuyerId       sql.NullInt64
+	IsDelete      sql.NullBool
+	CreatedAt     sql.NullTime
+	UpdatedAt     sql.NullTime
+	CreatedBy     sql.NullString
+	UpdatedBy     sql.NullString
 }

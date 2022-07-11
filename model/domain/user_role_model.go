@@ -1,9 +1,11 @@
 package domain
 
-import "time"
+import (
+	"database/sql"
+)
 
 type UserRoleModel struct {
-	Id        int64
-	Role      string
-	CreatedAt time.Time
+	Id        sql.NullInt64
+	Role      sql.NullString
+	CreatedAt sql.NullTime
 }

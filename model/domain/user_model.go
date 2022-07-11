@@ -1,23 +1,25 @@
 package domain
 
-import "time"
+import (
+	"database/sql"
+)
 
 type UserModel struct {
-	Id            int64
-	Email         string
-	Password      string
-	FirstName     string
-	LastName      string
-	UserRoleId    int64
-	CompanyId     int64
-	PrincipalId   int64
-	DistributorId int64
-	BuyerId       int64
-	TokenVersion  int64
-	IsVerified    bool
-	IsDelete      bool
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	CreatedBy     string
-	UpdatedBy     string
+	Id            sql.NullInt64
+	Email         sql.NullString
+	Password      sql.NullString
+	FirstName     sql.NullString
+	LastName      sql.NullString
+	UserRoleId    sql.NullInt64
+	CompanyId     sql.NullInt64
+	PrincipalId   sql.NullInt64
+	DistributorId sql.NullInt64
+	BuyerId       sql.NullInt64
+	TokenVersion  sql.NullInt64
+	IsVerified    sql.NullBool
+	IsDelete      sql.NullBool
+	CreatedAt     sql.NullTime
+	UpdatedAt     sql.NullTime
+	CreatedBy     sql.NullString
+	UpdatedBy     sql.NullString
 }

@@ -20,6 +20,7 @@ func (repository *UserRoleRepositoryImpl) FindAll(ctx context.Context, db *sql.D
 	querySql := "SELECT id, role, created_at FROM user_role"
 
 	conn, err := db.Conn(ctx)
+	helper.PanicIfError(err)
 	rows, err := conn.QueryContext(ctx, querySql)
 	defer rows.Close()
 	helper.PanicIfError(err)
@@ -43,6 +44,7 @@ func (repository *UserRoleRepositoryImpl) FindById(ctx context.Context, db *sql.
 	querySql := "SELECT id, role, created_at FROM user_role WHERE id = ?"
 
 	conn, err := db.Conn(ctx)
+	helper.PanicIfError(err)
 	row, err := conn.QueryContext(ctx, querySql, userRoleId)
 	helper.PanicIfError(err)
 
@@ -72,7 +74,7 @@ func (repository *UserRoleRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, 
 	id, err := result.LastInsertId()
 	helper.PanicIfError(err)
 
-	userRole.Id = id
+	userRole.Id.Int64 = id
 	return userRole
 }
 

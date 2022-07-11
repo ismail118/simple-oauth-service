@@ -19,6 +19,7 @@ func (repository *DataScopeRepositoryImpl) FindAll(ctx context.Context, db *sql.
 	querySql := "SELECT id, user_id, principal_id, distributor_id, buyer_id, is_delete, created_at, updated_at, created_by, updated_by FROM data_scope"
 
 	conn, err := db.Conn(ctx)
+	helper.PanicIfError(err)
 	rows, err := conn.QueryContext(ctx, querySql)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -49,6 +50,7 @@ func (repository *DataScopeRepositoryImpl) FindById(ctx context.Context, db *sql
 	querySql := "SELECT id, user_id, principal_id, distributor_id, buyer_id, is_delete, created_at, updated_at, created_by, updated_by FROM data_scope WHERE id = ?"
 
 	conn, err := db.Conn(ctx)
+	helper.PanicIfError(err)
 	rows, err := conn.QueryContext(ctx, querySql, dataScopeId)
 	helper.PanicIfError(err)
 	defer rows.Close()
@@ -94,7 +96,7 @@ func (repository *DataScopeRepositoryImpl) Save(ctx context.Context, tx *sql.Tx,
 	id, err := result.LastInsertId()
 	helper.PanicIfError(err)
 
-	dataScope.Id = id
+	dataScope.Id.Int64 = id
 	return dataScope
 }
 func (repository *DataScopeRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, dataScope domain.DataScopeModel) domain.DataScopeModel {
