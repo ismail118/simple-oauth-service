@@ -138,6 +138,8 @@ func (service *OAuth2ServiceImpl) RefreshToken(ctx context.Context, c *http.Cook
 	refreshTokenClaim, err := helper.ParseJwtTokenToClaims(c.Value, constanta.SecretKey)
 	helper.PanicIfError(err)
 
+	refreshTokenClaim.Context.Context = context.Background()
+
 	user, err := service.OauthRepository.FindUserById(refreshTokenClaim.Context, service.DB, refreshTokenClaim.Context.User.Id)
 	helper.PanicIfError(err)
 

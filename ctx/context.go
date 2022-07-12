@@ -8,8 +8,9 @@ import (
 	"simple-oauth-service/model/response"
 )
 
+// Context field context.Context `json:"-"` , is to ignore when process jwt.Encode for avoid error when process jwt.Decode
 type Context struct {
-	context.Context
+	context.Context   `json:"-"`
 	User              response.UserResponse        `json:"user"`
 	UserRole          response.UserRoleResponse    `json:"user_role"`
 	DataScopes        []response.DataScopeResponse `json:"data_scopes"`

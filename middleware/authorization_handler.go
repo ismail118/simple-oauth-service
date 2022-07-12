@@ -33,6 +33,11 @@ func AuthorizationHandler(next http.Handler) http.Handler {
 				IsUrlPrefix: false,
 			},
 			{
+				Method:      "GET",
+				Url:         "/oauth/refresh_token",
+				IsUrlPrefix: false,
+			},
+			{
 				Method:      "POST",
 				Url:         "/api/user",
 				IsUrlPrefix: false,
@@ -75,6 +80,8 @@ func AuthorizationHandler(next http.Handler) http.Handler {
 
 		accessTokenClaim, err := helper.ParseJwtTokenToClaims(xAuthorizationHeader, constanta.SecretKey)
 		helper.PanicIfError(err)
+
+		accessTokenClaim.Context.Context = r.Context()
 
 		r = r.WithContext(accessTokenClaim.Context)
 

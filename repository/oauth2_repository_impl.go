@@ -137,12 +137,15 @@ func (repository *Oauth2RepositoryImpl) FindDataContextByUserId(ctx context.Cont
 	helper.PanicIfError(err)
 	rows, err := conn.QueryContext(ctx, querySql, userId)
 	helper.PanicIfError(err)
+	defer rows.Close()
 
 	var user domain.UserModel
 	var userRole domain.UserRoleModel
 	var dataScopes []domain.DataScopeModel
+	var counter int
 
 	for rows.Next() {
+		counter++
 		var dataScope domain.DataScopeModel
 		err := rows.Scan(
 			&user.Id,
@@ -179,6 +182,10 @@ func (repository *Oauth2RepositoryImpl) FindDataContextByUserId(ctx context.Cont
 		helper.PanicIfError(err)
 
 		dataScopes = append(dataScopes, dataScope)
+	}
+
+	if counter == 0 {
+		return domain.DataContextModel{}, errors.New("data not found")
 	}
 
 	return domain.DataContextModel{

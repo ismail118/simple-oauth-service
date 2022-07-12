@@ -24,16 +24,16 @@ func CheckRoles(ctx ctx.Context, roles ...string) error {
 	}
 }
 
-func ValidateRefreshToken(r *http.Request) bool {
+func ValidateRefreshToken(r *http.Request) (*http.Cookie, bool) {
 	c, err := r.Cookie("jid")
 	if err != nil {
-		return false
+		return nil, false
 	}
 
 	_, err = ParseJwtTokenToClaims(c.Value, constanta.SecretKey)
 	if err != nil {
-		return false
+		return nil, false
 	}
 
-	return true
+	return c, true
 }

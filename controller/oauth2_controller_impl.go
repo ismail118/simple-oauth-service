@@ -48,7 +48,7 @@ func (controller *OAuth2ControllerImpl) Login(w http.ResponseWriter, r *http.Req
 	helper.PanicIfError(err)
 	redirectUrl := vars["redirectUrl"]
 
-	isValidToken := helper.ValidateRefreshToken(r)
+	_, isValidToken := helper.ValidateRefreshToken(r)
 
 	if r.Method != http.MethodPost && !isValidToken {
 		t, err2 := template.ParseFS(templates.Templates, "*.gohtml")
@@ -58,7 +58,10 @@ func (controller *OAuth2ControllerImpl) Login(w http.ResponseWriter, r *http.Req
 		helper.PanicIfError(err2)
 		return
 	} else if isValidToken {
-		http.Redirect(w, r, "/oauth/refresh_token", http.StatusPermanentRedirect)
+		req, err3 := http.NewRequest(http.MethodPost, "/oauth/refresh_token", nil)
+		helper.PanicIfError(err3)
+		fmt.Println(req.URL.String())
+		http.Redirect(w, r, req.URL.String(), http.StatusPermanentRedirect)
 		return
 	}
 
@@ -109,6 +112,8 @@ func (controller *OAuth2ControllerImpl) RefreshToken(w http.ResponseWriter, r *h
 
 	accessTokenResponse, cookie := controller.Oauth2Service.RefreshToken(r.Context(), c)
 
+	c.MaxAge = -1
+
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
 		Status: constanta.Status200,
@@ -133,7 +138,7 @@ func (controller *OAuth2ControllerImpl) RevokeRefreshToken(w http.ResponseWriter
 }
 
 func (controller *OAuth2ControllerImpl) InternalLogin(w http.ResponseWriter, r *http.Request) {
-	isValidToken := helper.ValidateRefreshToken(r)
+	_, isValidToken := helper.ValidateRefreshToken(r)
 
 	if r.Method != http.MethodPost && !isValidToken {
 		t, err2 := template.ParseFS(templates.Templates, "*.gohtml")
@@ -143,7 +148,10 @@ func (controller *OAuth2ControllerImpl) InternalLogin(w http.ResponseWriter, r *
 		helper.PanicIfError(err2)
 		return
 	} else if isValidToken {
-		http.Redirect(w, r, "/oauth/refresh_token", http.StatusPermanentRedirect)
+		req, err := http.NewRequest(http.MethodPost, "/oauth/refresh_token", nil)
+		helper.PanicIfError(err)
+		fmt.Println(req.URL.String())
+		http.Redirect(w, r, req.URL.String(), http.StatusPermanentRedirect)
 		return
 	}
 
