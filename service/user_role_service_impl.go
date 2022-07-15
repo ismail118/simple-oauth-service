@@ -61,8 +61,8 @@ func (service *UserRoleServiceImpl) Create(ctx ctx.Context, request request.User
 	defer helper.CommitOrRollback(tx)
 
 	userRole := domain.UserRoleModel{
-		Role:      sql.NullString{String: request.Role},
-		CreatedAt: sql.NullTime{Time: time.Now()},
+		Role:      sql.NullString{String: request.Role, Valid: true},
+		CreatedAt: sql.NullTime{Time: time.Now(), Valid: true},
 	}
 
 	userRole = service.UserRoleRepository.Save(ctx, tx, userRole)
@@ -87,8 +87,8 @@ func (service *UserRoleServiceImpl) Update(ctx ctx.Context, request request.User
 	}
 
 	userRole = domain.UserRoleModel{
-		Id:        sql.NullInt64{Int64: request.Id},
-		Role:      sql.NullString{String: request.Role},
+		Id:        sql.NullInt64{Int64: request.Id, Valid: true},
+		Role:      sql.NullString{String: request.Role, Valid: true},
 		CreatedAt: userRole.CreatedAt,
 	}
 

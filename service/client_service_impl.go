@@ -61,14 +61,14 @@ func (service *ClientServiceImpl) Create(ctx ctx.Context, request request.Client
 	defer helper.CommitOrRollback(tx)
 
 	client := domain.ClientModel{
-		ApplicationName: sql.NullString{String: request.ApplicationName},
-		UserId:          sql.NullInt64{Int64: ctx.User.Id},
-		ClientSecret:    sql.NullString{String: helper.RandStringBytes(15)},
-		IsDelete:        sql.NullBool{Bool: false},
-		CreatedAt:       sql.NullTime{Time: time.Now()},
-		UpdatedAt:       sql.NullTime{Time: time.Now()},
-		CreatedBy:       sql.NullString{String: ctx.User.Email},
-		UpdatedBy:       sql.NullString{String: ctx.User.Email},
+		ApplicationName: sql.NullString{String: request.ApplicationName, Valid: true},
+		UserId:          sql.NullInt64{Int64: ctx.User.Id, Valid: true},
+		ClientSecret:    sql.NullString{String: helper.RandStringBytes(15), Valid: true},
+		IsDelete:        sql.NullBool{Bool: false, Valid: true},
+		CreatedAt:       sql.NullTime{Time: time.Now(), Valid: true},
+		UpdatedAt:       sql.NullTime{Time: time.Now(), Valid: true},
+		CreatedBy:       sql.NullString{String: ctx.User.Email, Valid: true},
+		UpdatedBy:       sql.NullString{String: ctx.User.Email, Valid: true},
 	}
 
 	client = service.ClientRepository.Save(ctx, tx, client)
@@ -95,13 +95,13 @@ func (service *ClientServiceImpl) Update(ctx ctx.Context, request request.Client
 	client = domain.ClientModel{
 		Id:              client.Id,
 		UserId:          client.UserId,
-		ApplicationName: sql.NullString{String: request.ApplicationName},
+		ApplicationName: sql.NullString{String: request.ApplicationName, Valid: true},
 		ClientSecret:    client.ClientSecret,
-		IsDelete:        sql.NullBool{Bool: request.IsDelete},
+		IsDelete:        sql.NullBool{Bool: request.IsDelete, Valid: true},
 		CreatedAt:       client.CreatedAt,
-		UpdatedAt:       sql.NullTime{Time: time.Now()},
+		UpdatedAt:       sql.NullTime{Time: time.Now(), Valid: true},
 		CreatedBy:       client.CreatedBy,
-		UpdatedBy:       sql.NullString{String: ctx.User.Email},
+		UpdatedBy:       sql.NullString{String: ctx.User.Email, Valid: true},
 	}
 
 	client = service.ClientRepository.Update(ctx, tx, client)

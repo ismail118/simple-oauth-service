@@ -61,14 +61,14 @@ func (service *DataScopeServiceImpl) Create(ctx ctx.Context, request request.Dat
 	defer helper.CommitOrRollback(tx)
 
 	dataScope := domain.DataScopeModel{
-		PrincipalId:   sql.NullInt64{Int64: request.PrincipalId},
-		DistributorId: sql.NullInt64{Int64: request.DistributorId},
-		BuyerId:       sql.NullInt64{Int64: request.BuyerId},
-		IsDelete:      sql.NullBool{Bool: false},
-		CreatedAt:     sql.NullTime{Time: time.Now()},
-		UpdatedAt:     sql.NullTime{Time: time.Now()},
-		CreatedBy:     sql.NullString{String: ctx.User.Email},
-		UpdatedBy:     sql.NullString{String: ctx.User.Email},
+		PrincipalId:   sql.NullInt64{Int64: request.PrincipalId, Valid: true},
+		DistributorId: sql.NullInt64{Int64: request.DistributorId, Valid: true},
+		BuyerId:       sql.NullInt64{Int64: request.BuyerId, Valid: true},
+		IsDelete:      sql.NullBool{Bool: false, Valid: true},
+		CreatedAt:     sql.NullTime{Time: time.Now(), Valid: true},
+		UpdatedAt:     sql.NullTime{Time: time.Now(), Valid: true},
+		CreatedBy:     sql.NullString{String: ctx.User.Email, Valid: true},
+		UpdatedBy:     sql.NullString{String: ctx.User.Email, Valid: true},
 	}
 
 	dataScope = service.DataScopeRepository.Save(ctx, tx, dataScope)
@@ -93,16 +93,16 @@ func (service *DataScopeServiceImpl) Update(ctx ctx.Context, request request.Dat
 	}
 
 	dataScope = domain.DataScopeModel{
-		Id:            sql.NullInt64{Int64: request.Id},
-		UserId:        sql.NullInt64{Int64: request.UserId},
-		PrincipalId:   sql.NullInt64{Int64: request.PrincipalId},
-		DistributorId: sql.NullInt64{Int64: request.DistributorId},
-		BuyerId:       sql.NullInt64{Int64: request.BuyerId},
-		IsDelete:      sql.NullBool{Bool: request.IsDelete},
+		Id:            sql.NullInt64{Int64: request.Id, Valid: true},
+		UserId:        sql.NullInt64{Int64: request.UserId, Valid: true},
+		PrincipalId:   sql.NullInt64{Int64: request.PrincipalId, Valid: true},
+		DistributorId: sql.NullInt64{Int64: request.DistributorId, Valid: true},
+		BuyerId:       sql.NullInt64{Int64: request.BuyerId, Valid: true},
+		IsDelete:      sql.NullBool{Bool: request.IsDelete, Valid: true},
 		CreatedAt:     dataScope.CreatedAt,
-		UpdatedAt:     sql.NullTime{Time: time.Now()},
+		UpdatedAt:     sql.NullTime{Time: time.Now(), Valid: true},
 		CreatedBy:     dataScope.CreatedBy,
-		UpdatedBy:     sql.NullString{String: ctx.User.Email},
+		UpdatedBy:     sql.NullString{String: ctx.User.Email, Valid: true},
 	}
 
 	dataScope = service.DataScopeRepository.Update(ctx, tx, dataScope)
