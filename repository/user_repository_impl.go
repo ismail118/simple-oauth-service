@@ -119,7 +119,7 @@ func (repository *UserRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, user
 }
 
 func (repository *UserRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, user domain.UserModel) domain.UserModel {
-	querySql := "UPDATE user SET email = ?, password = ?, first_name = ?, last_name = ?, user_role_id = ?, company_id = ?, principal_id = ?, distributor_id = ?, buyer_id = ?, is_verified = ?, is_delete = ?, created_at = ?, updated_at = ?, created_by = ?, updated_by = ? WHERE id = ?"
+	querySql := "UPDATE user SET email = ?, password = ?, first_name = ?, last_name = ?, user_role_id = ?, company_id = ?, principal_id = ?, distributor_id = ?, buyer_id = ?, token_version = ?, is_verified = ?, is_delete = ?, created_at = ?, updated_at = ?, created_by = ?, updated_by = ? WHERE id = ?"
 
 	_, err := tx.ExecContext(ctx, querySql,
 		user.Email,
@@ -131,6 +131,7 @@ func (repository *UserRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, us
 		user.PrincipalId,
 		user.DistributorId,
 		user.BuyerId,
+		user.TokenVersion,
 		user.IsVerified,
 		user.IsDelete,
 		user.CreatedAt,

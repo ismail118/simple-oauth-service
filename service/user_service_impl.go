@@ -250,6 +250,8 @@ func (service *UserServiceImpl) ChangePassword(ctx ctx.Context, request request.
 		panic(errors.NewValidationErrors(constanta.WrongPassword))
 	}
 
+	helper.IncreaseUserTokenVersion(&user)
+
 	user = domain.UserModel{
 		Id:            user.Id,
 		Email:         user.Email,

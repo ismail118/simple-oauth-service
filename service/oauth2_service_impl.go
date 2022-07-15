@@ -178,11 +178,7 @@ func (service *OAuth2ServiceImpl) RevokeRefreshToken(ctx context.Context, reques
 		panic(errors.NewNotFoundError(constanta.UserNotFound))
 	}
 
-	if user.TokenVersion.Int64 >= 1000 {
-		user.TokenVersion.Int64 = 0
-	} else {
-		user.TokenVersion.Int64++
-	}
+	helper.IncreaseUserTokenVersion(&user)
 
 	service.OauthRepository.UpdateUserTokenVersion(ctx, tx, request.UserId, user.TokenVersion.Int64)
 }

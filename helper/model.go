@@ -98,3 +98,13 @@ func ToUserRoleResponses(userRoles []domain.UserRoleModel) []response.UserRoleRe
 
 	return userRoleResponses
 }
+
+func IncreaseUserTokenVersion(user *domain.UserModel) {
+	if user.TokenVersion.Int64 >= 1000 {
+		user.TokenVersion.Int64 = 0
+		user.TokenVersion.Valid = true
+	} else {
+		user.TokenVersion.Int64++
+		user.TokenVersion.Valid = true
+	}
+}
