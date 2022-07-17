@@ -61,6 +61,7 @@ func (service *DataScopeServiceImpl) Create(ctx ctx.Context, request request.Dat
 	defer helper.CommitOrRollback(tx)
 
 	dataScope := domain.DataScopeModel{
+		UserId:        sql.NullInt64{Int64: request.UserId, Valid: true},
 		PrincipalId:   sql.NullInt64{Int64: request.PrincipalId, Valid: true},
 		DistributorId: sql.NullInt64{Int64: request.DistributorId, Valid: true},
 		BuyerId:       sql.NullInt64{Int64: request.BuyerId, Valid: true},

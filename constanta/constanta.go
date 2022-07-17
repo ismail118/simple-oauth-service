@@ -23,6 +23,8 @@ const ExpiredToken = "Expired Token"
 const SomeoneAlreadyUseThisEmail = "Someone Already Use This Email"
 const InvalidOtp = "Invalid OTP"
 const SubjectUserCreate = "Your OTP from Simple Oauth Service"
+const AccessToken = "access_token"
+const RefreshToken = "refresh_token"
 
 //HTTP STATUS
 //Successful responses

@@ -18,8 +18,8 @@ func NewRouter(oauth2Controller controller.OAuth2Controller,
 
 	router := mux.NewRouter()
 
-	router.HandleFunc("/oauth/authorize", oauth2Controller.Authorize).Methods(http.MethodPost)
-	router.HandleFunc("/oauth/login/{clientId}/{redirectUrl}", oauth2Controller.Login).Methods(http.MethodGet, http.MethodPost)
+	router.HandleFunc("/oauth/authorize", oauth2Controller.Authorize).Methods(http.MethodGet, http.MethodPost)
+	router.HandleFunc("/oauth/login", oauth2Controller.Login).Methods(http.MethodGet, http.MethodPost)
 	router.HandleFunc("/oauth/access_token", oauth2Controller.AccessToken).Methods(http.MethodPost)
 	router.HandleFunc("/oauth/refresh_token", oauth2Controller.RefreshToken).Methods(http.MethodGet, http.MethodPost)
 	router.HandleFunc("/oauth/revoke_refresh_token", oauth2Controller.RevokeRefreshToken).Methods(http.MethodPost)

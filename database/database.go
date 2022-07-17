@@ -1,7 +1,9 @@
 package database
 
 import (
+	"context"
 	"database/sql"
+	"errors"
 	"github.com/go-redis/redis/v8"
 	_ "github.com/go-sql-driver/mysql"
 	"simple-oauth-service/helper"
@@ -17,6 +19,9 @@ func NewDB() *sql.DB {
 	db.SetConnMaxIdleTime(5 * time.Minute)
 	db.SetConnMaxLifetime(60 * time.Minute)
 
+	if err2 := db.Ping(); err2 != nil {
+		panic(errors.New("mysql database connection failed"))
+	}
 	return db
 }
 
@@ -26,6 +31,10 @@ func NewRedisClient() *redis.Client {
 		Password: "",
 		DB:       0,
 	})
+
+	if _, err := client.Ping(context.Background()).Result(); err != nil {
+		panic(errors.New("redis database connection failed"))
+	}
 
 	return client
 }

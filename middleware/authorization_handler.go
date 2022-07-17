@@ -18,7 +18,7 @@ func AuthorizationHandler(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		noNeedAuthUrls := []UrlData{
 			{
-				Method:      "POST",
+				Method:      "GET",
 				Url:         "/oauth/authorize",
 				IsUrlPrefix: false,
 			},
@@ -59,12 +59,22 @@ func AuthorizationHandler(next http.Handler) http.Handler {
 			},
 			{
 				Method:      "POST",
-				Url:         "/oauth/login/",
+				Url:         "/oauth/login",
+				IsUrlPrefix: false,
+			},
+			{
+				Method:      "GET",
+				Url:         "/oauth/login",
+				IsUrlPrefix: false,
+			},
+			{
+				Method:      "POST",
+				Url:         "/test/",
 				IsUrlPrefix: true,
 			},
 			{
 				Method:      "GET",
-				Url:         "/oauth/login/",
+				Url:         "/test/",
 				IsUrlPrefix: true,
 			},
 		}
@@ -81,6 +91,9 @@ func AuthorizationHandler(next http.Handler) http.Handler {
 		accessTokenClaim, err := helper.ParseJwtTokenToClaims(xAuthorizationHeader, constanta.SecretKey)
 		helper.PanicIfError(err)
 
+		if accessTokenClaim.RegisteredClaims.Subject != constanta.AccessToken {
+			panic(errors.NewForbiddenError(constanta.InvalidToken))
+		}
 		accessTokenClaim.Context.Context = r.Context()
 
 		r = r.WithContext(accessTokenClaim.Context)

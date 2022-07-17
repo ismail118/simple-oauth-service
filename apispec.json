@@ -11,28 +11,28 @@
     }
   ],
   "paths": {
-    "/oauth/authorize": {
-      "post": {
+    "/oauth/authorize?client_id={clinet_id}&redirect_url={redirect_url}&state={state}": {
+      "get": {
         "tags": ["OAuth2 API"],
         "description": "Service for authorize client",
         "summary": "Service for authorize client",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "client_id": {
-                    "type": "integer"
-                  },
-                  "redirect_url": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "description": "client id"
+          },
+          {
+            "name": "redirect_uri",
+            "in": "path",
+            "description": "callback url"
+          },
+          {
+            "name": "state",
+            "in": "path",
+            "description": "state"
           }
-        },
+        ],
         "responses": {
           "301": {
             "description": "Moved Permanently",
@@ -55,7 +55,7 @@
         }
       }
     },
-    "/oauth/login/{clientId}/{redirectUrl}": {
+    "/oauth/login?client_id={clinet_id}&redirect_url={redirect_url}&state={state}": {
       "post": {
         "tags": ["OAuth2 API"],
         "description": "Service for user login response_type code",
@@ -67,9 +67,14 @@
             "description": "client id"
           },
           {
-            "name": "redirect_url",
+            "name": "redirect_uri",
             "in": "path",
-            "description": "redirect url"
+            "description": "callback url"
+          },
+          {
+            "name": "state",
+            "in": "path",
+            "description": "state"
           }
         ],
         "requestBody": {
@@ -90,8 +95,8 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "Success Generate Authorize Code",
+          "301": {
+            "description": "Moved Permanently to redirect_url with query value {code} and {state} in redirect_url ex: http://localhost:3000/test/callback?code={code}&state={state}",
             "content": {
               "application/json": {
                 "schema": {
@@ -102,14 +107,6 @@
                     },
                     "status": {
                       "type": "string"
-                    },
-                    "data": {
-                      "type": "object",
-                      "properties": {
-                        "authorization_code": {
-                          "type": "string"
-                        }
-                      }
                     }
                   }
                 }
@@ -130,7 +127,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "authorize_code": {
+                  "code": {
                     "type": "string"
                   },
                   "client_id": {
@@ -147,14 +144,6 @@
         "responses": {
           "200": {
             "description": "Success Generate Access Token",
-            "headers": {
-              "Set-Cookie": {
-                "schema": {
-                  "type": "string",
-                  "example": "jid=abcdef1234"
-                }
-              }
-            },
             "content": {
               "application/json": {
                 "schema": {
@@ -171,6 +160,10 @@
                       "properties": {
                         "access_token": {
                           "type": "string"
+                        },
+                        "refresh_token": {
+                          "type": "string",
+                          "description": "When you get this refresh_token you should create new cookie on your browser with name jid and value is refresh_token and path is / "
                         }
                       }
                     }
@@ -217,6 +210,10 @@
                       "properties": {
                         "access_token": {
                           "type": "string"
+                        },
+                        "refresh_token": {
+                          "type": "string",
+                          "description": "when you refresh token this field always empty because we already set refresh token on your request"
                         }
                       }
                     }
@@ -1407,9 +1404,6 @@
       "user_roleUpdate": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "number"
-          },
           "role": {
             "type": "string"
           }

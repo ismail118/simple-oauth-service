@@ -74,8 +74,8 @@ func (service *OAuth2ServiceImpl) Login(ctx context.Context, request request.Log
 	dataContext, err := ctx2.NewContext(userResponse, userRoleResponse, dataScopesResponse)
 	helper.PanicIfError(err)
 
-	accessTokenClaims := helper.NewMyCustomClaims(dataContext, strconv.FormatInt(user.Id.Int64, 10), "access token", time.Duration(24)*time.Hour)
-	refreshTokenClaims := helper.NewMyCustomClaims(dataContext, strconv.FormatInt(user.Id.Int64, 10), "refresh token", time.Duration(24*7)*time.Hour)
+	accessTokenClaims := helper.NewMyCustomClaims(dataContext, user.Email.String, constanta.AccessToken, time.Duration(24)*time.Hour)
+	refreshTokenClaims := helper.NewMyCustomClaims(dataContext, user.Email.String, constanta.RefreshToken, time.Duration(24*7)*time.Hour)
 
 	accessTokenStr, err := helper.GenerateJwtToken(accessTokenClaims, constanta.SecretKey)
 	helper.PanicIfError(err)
@@ -98,7 +98,7 @@ func (service *OAuth2ServiceImpl) Login(ctx context.Context, request request.Log
 	}
 }
 
-func (service *OAuth2ServiceImpl) AccessToken(ctx context.Context, request request.AccessTokenRequest) (response.AccessTokenResponse, *http.Cookie) {
+func (service *OAuth2ServiceImpl) AccessToken(ctx context.Context, request request.AccessTokenRequest) response.AccessTokenResponse {
 	err := service.Validator.Struct(request)
 	helper.PanicIfError(err)
 
@@ -111,23 +111,19 @@ func (service *OAuth2ServiceImpl) AccessToken(ctx context.Context, request reque
 		helper.PanicIfError(errors.NewUnauthorizedError(constanta.WrongClientSecret))
 	}
 
-	var accessAndRefreshTokenResponse response.AccessAndRefreshTokenResponse
-	accessAndRefreshTokenResponseStr, err := helper.Get(ctx, service.RDB, request.AuthorizationCode)
+	accessAndRefreshTokenResponseStr, err := helper.Get(ctx, service.RDB, request.Code)
 	helper.PanicIfError(err)
 
-	cookie := &http.Cookie{
-		Name:  "jid",
-		Value: accessAndRefreshTokenResponse.RefreshToken,
-	}
-
+	var accessAndRefreshTokenResponse response.AccessAndRefreshTokenResponse
 	err = json.Unmarshal([]byte(accessAndRefreshTokenResponseStr), &accessAndRefreshTokenResponse)
 	helper.PanicIfError(err)
 
-	helper.Delete(ctx, service.RDB, request.AuthorizationCode)
+	helper.Delete(ctx, service.RDB, request.Code)
 
 	return response.AccessTokenResponse{
-		AccessToken: accessAndRefreshTokenResponse.AccessToken,
-	}, cookie
+		AccessToken:  accessAndRefreshTokenResponse.AccessToken,
+		RefreshToken: accessAndRefreshTokenResponse.RefreshToken,
+	}
 }
 
 func (service *OAuth2ServiceImpl) RefreshToken(ctx context.Context, c *http.Cookie) (response.AccessTokenResponse, *http.Cookie) {
@@ -138,6 +134,10 @@ func (service *OAuth2ServiceImpl) RefreshToken(ctx context.Context, c *http.Cook
 	refreshTokenClaim, err := helper.ParseJwtTokenToClaims(c.Value, constanta.SecretKey)
 	helper.PanicIfError(err)
 
+	if refreshTokenClaim.RegisteredClaims.Subject != constanta.RefreshToken {
+		panic(errors.NewForbiddenError(constanta.InvalidToken))
+	}
+
 	refreshTokenClaim.Context.Context = context.Background()
 
 	user, err := service.OauthRepository.FindUserById(refreshTokenClaim.Context, service.DB, refreshTokenClaim.Context.User.Id)
@@ -147,8 +147,8 @@ func (service *OAuth2ServiceImpl) RefreshToken(ctx context.Context, c *http.Cook
 		panic(errors.NewUnauthorizedError(constanta.InvalidToken))
 	}
 
-	accessTokenClaims := helper.NewMyCustomClaims(refreshTokenClaim.Context, "access token", "token", time.Duration(24)*time.Hour)
-	refreshTokenClaims := helper.NewMyCustomClaims(refreshTokenClaim.Context, "refresh token", "token", time.Duration(24*7)*time.Hour)
+	accessTokenClaims := helper.NewMyCustomClaims(refreshTokenClaim.Context, user.Email.String, constanta.AccessToken, time.Duration(24)*time.Hour)
+	refreshTokenClaims := helper.NewMyCustomClaims(refreshTokenClaim.Context, user.Email.String, constanta.RefreshToken, time.Duration(24*7)*time.Hour)
 
 	accessTokenStr, err := helper.GenerateJwtToken(accessTokenClaims, constanta.SecretKey)
 	helper.PanicIfError(err)
@@ -158,6 +158,7 @@ func (service *OAuth2ServiceImpl) RefreshToken(ctx context.Context, c *http.Cook
 	cookie := &http.Cookie{
 		Name:  "jid",
 		Value: refreshTokenStr,
+		Path:  "/",
 	}
 
 	return response.AccessTokenResponse{
@@ -223,6 +224,7 @@ func (service *OAuth2ServiceImpl) InternalLogin(ctx context.Context, request req
 	cookie := &http.Cookie{
 		Name:  "jid",
 		Value: refreshTokenStr,
+		Path:  "/",
 	}
 
 	return response.AccessTokenResponse{

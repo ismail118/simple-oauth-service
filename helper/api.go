@@ -3,6 +3,7 @@ package helper
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -48,7 +49,7 @@ func SendPostHttpRequest(reqUrl string, requestBody interface{}) (string, error)
 		return "", err
 	}
 
-	defer PanicIfError(response.Body.Close())
+	defer response.Body.Close()
 
 	body, err := ioutil.ReadAll(response.Body)
 	if err != nil {
@@ -190,8 +191,15 @@ func SendMultipartFormHttpRequest(reqUrl string, fieldFiles map[string]string, f
 	}
 	request.Header.Set("Content-Type", multiPartWriter.FormDataContentType())
 
-	client := &http.Client{}
+	client := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
 	response, err := client.Do(request)
+	if err != nil && errors.Is(err, http.ErrUseLastResponse) {
+		fmt.Println(err)
+	}
 	if err != nil {
 		return nil, err
 	}

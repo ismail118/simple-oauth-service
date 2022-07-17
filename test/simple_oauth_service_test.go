@@ -2,11 +2,14 @@ package test
 
 import (
 	"database/sql"
+	"encoding/json"
+	"errors"
 	"fmt"
 	validator2 "github.com/go-playground/validator"
 	_ "github.com/go-sql-driver/mysql"
 	"gopkg.in/gomail.v2"
 	"net/http"
+	"net/url"
 	"simple-oauth-service/controller"
 	"simple-oauth-service/database"
 	"simple-oauth-service/helper"
@@ -16,6 +19,8 @@ import (
 	"testing"
 	"time"
 )
+
+var State = "t3xegaMHDPYD5NwB"
 
 func NewDBTest() *sql.DB {
 	db, err := sql.Open("mysql", "root:Colonelgila123@tcp(localhost:3306)/auth?parseTime=true")
@@ -62,6 +67,55 @@ func TestSimpleOauthService(t *testing.T) {
 
 	r := router.NewRouter(oauthController, userController, userRoleController, dataScopeController, clientController)
 
+	r.HandleFunc("/test/login", func(writer http.ResponseWriter, request *http.Request) {
+		clientId := 1
+		redirectUrl := "http://localhost:3000/test/callback"
+
+		oauthUrl := fmt.Sprintf("http://localhost:3000/oauth/authorize?client_id=%d&redirect_url=%s&state=%s", clientId, redirectUrl, State)
+		http.Redirect(writer, request, oauthUrl, http.StatusPermanentRedirect)
+	}).Methods(http.MethodGet)
+
+	r.HandleFunc("/test/callback", func(writer http.ResponseWriter, request *http.Request) {
+		u, err := url.Parse(request.URL.String())
+		helper.PanicIfError(err)
+
+		code := u.Query()["code"][0]
+		state := u.Query()["state"][0]
+		if state != State {
+			_, err2 := fmt.Fprintln(writer, "invalid state")
+			helper.PanicIfError(err2)
+			return
+		}
+
+		reqBody := map[string]interface{}{
+			"code":          code,
+			"client_id":     1,
+			"client_secret": "ONRhfKsUOHoF8iV",
+		}
+		result, err := helper.SendPostHttpRequest("http://localhost:3000/oauth/access_token", reqBody)
+		helper.PanicIfError(err)
+
+		resBody := struct {
+			Code   int    `json:"code"`
+			Status string `json:"status"`
+			Data   struct {
+				AccessToken  string `json:"access_token"`
+				RefreshToken string `json:"refresh_token"`
+			} `json:"data"`
+		}{}
+
+		err = json.Unmarshal([]byte(result), &resBody)
+		helper.PanicIfError(err)
+
+		cookie := &http.Cookie{
+			Name:  "jid",
+			Value: resBody.Data.RefreshToken,
+			Path:  "/",
+		}
+
+		helper.WriteToResponseBodyWithCookie(writer, cookie, resBody)
+	}).Methods(http.MethodPost)
+
 	r.HandleFunc("/test", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("welcome test")
 	}).Methods(http.MethodGet, http.MethodPost)
@@ -73,4 +127,9 @@ func TestSimpleOauthService(t *testing.T) {
 
 	err := server.ListenAndServe()
 	helper.PanicIfError(err)
+}
+
+func TestError(t *testing.T) {
+	err := http.ErrNoCookie
+	fmt.Println(errors.Is(err, http.ErrNoCookie))
 }
