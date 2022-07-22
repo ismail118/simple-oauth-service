@@ -1,0 +1,24 @@
+{
+  "Server": {
+    "addr" : "localhost:3000"
+  },
+  "database": {
+    "mysql": {
+      "addr": "localhost:3306",
+      "user": "root",
+      "password": "Colonelgila123",
+      "database_name": "auth"
+    },
+    "redis": {
+      "addr": "localhost:6379",
+      "password": "",
+      "db": 0
+    }
+  },
+  "email": {
+    "host": "smtp.gmail.com",
+    "port": 587,
+    "email": "oauthserver99@gmail.com",
+    "password": "tvvlczggnxyvmham"
+  }
+}

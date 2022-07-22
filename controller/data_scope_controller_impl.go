@@ -26,7 +26,7 @@ func (controller *DataScopeControllerImpl) FindAll(w http.ResponseWriter, r *htt
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	dataScopeResponses := controller.DataScopeService.FindAll(ctx, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	dataScopeResponses := controller.DataScopeService.FindAll(ctx, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -39,13 +39,13 @@ func (controller *DataScopeControllerImpl) FindAll(w http.ResponseWriter, r *htt
 func (controller *DataScopeControllerImpl) FindById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	dataScopeId, err := strconv.ParseInt(vars["dataScopeId"], 10, 64)
+	dataScopeId, err := strconv.ParseInt(vars[constanta.DataScopeId], 10, 64)
 	helper.PanicIfError(err)
 
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	dataScopeResponse := controller.DataScopeService.FindById(ctx, dataScopeId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	dataScopeResponse := controller.DataScopeService.FindById(ctx, dataScopeId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -62,7 +62,7 @@ func (controller *DataScopeControllerImpl) Create(w http.ResponseWriter, r *http
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	dataScopeResponse := controller.DataScopeService.Create(ctx, dataScopeCreateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	dataScopeResponse := controller.DataScopeService.Create(ctx, dataScopeCreateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -75,7 +75,7 @@ func (controller *DataScopeControllerImpl) Create(w http.ResponseWriter, r *http
 func (controller *DataScopeControllerImpl) Update(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	dataScopeId, err := strconv.ParseInt(vars["dataScopeId"], 10, 64)
+	dataScopeId, err := strconv.ParseInt(vars[constanta.DataScopeId], 10, 64)
 	helper.PanicIfError(err)
 
 	var dataScopeUpdateRequest request.DataScopeUpdateRequest
@@ -86,7 +86,7 @@ func (controller *DataScopeControllerImpl) Update(w http.ResponseWriter, r *http
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	dataScopeResponse := controller.DataScopeService.Update(ctx, dataScopeUpdateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	dataScopeResponse := controller.DataScopeService.Update(ctx, dataScopeUpdateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -99,13 +99,13 @@ func (controller *DataScopeControllerImpl) Update(w http.ResponseWriter, r *http
 func (controller *DataScopeControllerImpl) Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	dataScopeId, err := strconv.ParseInt(vars["dataScopeId"], 10, 64)
+	dataScopeId, err := strconv.ParseInt(vars[constanta.DataScopeId], 10, 64)
 	helper.PanicIfError(err)
 
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	controller.DataScopeService.Delete(ctx, dataScopeId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	controller.DataScopeService.Delete(ctx, dataScopeId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,

@@ -15,7 +15,6 @@ import (
 	"simple-oauth-service/model/request"
 	"simple-oauth-service/model/response"
 	"simple-oauth-service/repository"
-	"strconv"
 	"time"
 )
 
@@ -134,6 +133,8 @@ func (service *OAuth2ServiceImpl) RefreshToken(ctx context.Context, c *http.Cook
 	refreshTokenClaim, err := helper.ParseJwtTokenToClaims(c.Value, constanta.SecretKey)
 	helper.PanicIfError(err)
 
+	c.MaxAge = -1
+
 	if refreshTokenClaim.RegisteredClaims.Subject != constanta.RefreshToken {
 		panic(errors.NewForbiddenError(constanta.InvalidToken))
 	}
@@ -156,7 +157,7 @@ func (service *OAuth2ServiceImpl) RefreshToken(ctx context.Context, c *http.Cook
 	helper.PanicIfError(err)
 
 	cookie := &http.Cookie{
-		Name:  "jid",
+		Name:  constanta.JID,
 		Value: refreshTokenStr,
 		Path:  "/",
 	}
@@ -213,8 +214,8 @@ func (service *OAuth2ServiceImpl) InternalLogin(ctx context.Context, request req
 	dataContext, err := ctx2.NewContext(userResponse, userRoleResponse, dataScopesResponse)
 	helper.PanicIfError(err)
 
-	accessTokenClaims := helper.NewMyCustomClaims(dataContext, strconv.FormatInt(user.Id.Int64, 10), "access token", time.Duration(24)*time.Hour)
-	refreshTokenClaims := helper.NewMyCustomClaims(dataContext, strconv.FormatInt(user.Id.Int64, 10), "refresh token", time.Duration(24*7)*time.Hour)
+	accessTokenClaims := helper.NewMyCustomClaims(dataContext, user.Email.String, constanta.AccessToken, time.Duration(24)*time.Hour)
+	refreshTokenClaims := helper.NewMyCustomClaims(dataContext, user.Email.String, constanta.RefreshToken, time.Duration(24*7)*time.Hour)
 
 	accessTokenStr, err := helper.GenerateJwtToken(accessTokenClaims, constanta.SecretKey)
 	helper.PanicIfError(err)
@@ -222,7 +223,7 @@ func (service *OAuth2ServiceImpl) InternalLogin(ctx context.Context, request req
 	helper.PanicIfError(err)
 
 	cookie := &http.Cookie{
-		Name:  "jid",
+		Name:  constanta.JID,
 		Value: refreshTokenStr,
 		Path:  "/",
 	}

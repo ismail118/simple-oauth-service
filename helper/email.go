@@ -2,13 +2,6 @@ package helper
 
 import "gopkg.in/gomail.v2"
 
-//dialer := gomail.NewDialer(
-//CONFIG_SMTP_HOST,
-//CONFIG_SMTP_PORT,
-//CONFIG_AUTH_EMAIL,
-//CONFIG_AUTH_PASSWORD,
-//)
-
 type Message struct {
 	From        string
 	To          []string

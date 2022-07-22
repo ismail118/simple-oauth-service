@@ -25,7 +25,7 @@ func CheckRoles(ctx ctx.Context, roles ...string) error {
 }
 
 func ValidateRefreshToken(r *http.Request) (*http.Cookie, bool) {
-	c, err := r.Cookie("jid")
+	c, err := r.Cookie(constanta.JID)
 	if err != nil {
 		return nil, false
 	}

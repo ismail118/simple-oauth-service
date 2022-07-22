@@ -4,17 +4,27 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/go-redis/redis/v8"
 	_ "github.com/go-sql-driver/mysql"
+	"simple-oauth-service/config"
 	"simple-oauth-service/helper"
 	"time"
 )
 
-func NewDB() *sql.DB {
-	db, err := sql.Open("mysql", "root:Colonelgila123@tcp(localhost:3306)/auth?parseTime=true")
+func NewDB(config *config.Config) *sql.DB {
+	// ex root:Colonelgila123@tcp(localhost:3306)/auth?parseTime=true
+	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s)/%s?parseTime=true",
+		config.Database.MySql.User,
+		config.Database.MySql.Password,
+		config.Database.MySql.Addr,
+		config.Database.MySql.DatabaseName,
+	)
+
+	db, err := sql.Open("mysql", dataSourceName)
 	helper.PanicIfError(err)
 
-	db.SetMaxIdleConns(100)
+	db.SetMaxIdleConns(20)
 	db.SetMaxOpenConns(100)
 	db.SetConnMaxIdleTime(5 * time.Minute)
 	db.SetConnMaxLifetime(60 * time.Minute)
@@ -25,11 +35,11 @@ func NewDB() *sql.DB {
 	return db
 }
 
-func NewRedisClient() *redis.Client {
+func NewRedisClient(config *config.Config) *redis.Client {
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "",
-		DB:       0,
+		Addr:     config.Database.Redis.Addr,
+		Password: config.Database.Redis.Password,
+		DB:       config.Database.Redis.DB,
 	})
 
 	if _, err := client.Ping(context.Background()).Result(); err != nil {

@@ -26,7 +26,7 @@ func (controller *UserControllerImpl) FindAll(w http.ResponseWriter, r *http.Req
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	userResponses := controller.UserService.FindAll(ctx, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	userResponses := controller.UserService.FindAll(ctx, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -45,7 +45,7 @@ func (controller *UserControllerImpl) FindById(w http.ResponseWriter, r *http.Re
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	userResponse := controller.UserService.FindById(ctx, userId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	userResponse := controller.UserService.FindById(ctx, userId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -83,7 +83,7 @@ func (controller *UserControllerImpl) Update(w http.ResponseWriter, r *http.Requ
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	userResponse := controller.UserService.Update(ctx, userUpdateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	userResponse := controller.UserService.Update(ctx, userUpdateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -102,7 +102,7 @@ func (controller *UserControllerImpl) Delete(w http.ResponseWriter, r *http.Requ
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	controller.UserService.Delete(ctx, userId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	controller.UserService.Delete(ctx, userId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,

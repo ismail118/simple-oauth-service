@@ -10,6 +10,9 @@ import (
 	"gopkg.in/gomail.v2"
 	"net/http"
 	"net/url"
+	"os"
+	config2 "simple-oauth-service/config"
+	"simple-oauth-service/constanta"
 	"simple-oauth-service/controller"
 	"simple-oauth-service/database"
 	"simple-oauth-service/helper"
@@ -35,14 +38,16 @@ func NewDBTest() *sql.DB {
 }
 
 func TestSimpleOauthService(t *testing.T) {
-	db := NewDBTest()
-	rdb := database.NewRedisClient()
+	fileConfig := os.Getenv("SIMPLE_OATH_SERVICE_CONFIG")
+	config := config2.NewConfig(fileConfig)
+	db := database.NewDB(config)
+	rdb := database.NewRedisClient(config)
 	validator := validator2.New()
 	dialer := gomail.NewDialer(
-		"smtp.gmail.com",
-		587,
-		"oauthserver99@gmail.com",
-		"tvvlczggnxyvmham",
+		config.Email.Host,
+		config.Email.Port,
+		config.Email.Email,
+		config.Email.Password,
 	)
 
 	oauth2Repository := repository.NewOauth2Repository()
@@ -72,7 +77,7 @@ func TestSimpleOauthService(t *testing.T) {
 		redirectUrl := "http://localhost:3000/test/callback"
 
 		oauthUrl := fmt.Sprintf("http://localhost:3000/oauth/authorize?client_id=%d&redirect_url=%s&state=%s", clientId, redirectUrl, State)
-		http.Redirect(writer, request, oauthUrl, http.StatusPermanentRedirect)
+		http.Redirect(writer, request, oauthUrl, http.StatusTemporaryRedirect)
 	}).Methods(http.MethodGet)
 
 	r.HandleFunc("/test/callback", func(writer http.ResponseWriter, request *http.Request) {
@@ -108,7 +113,7 @@ func TestSimpleOauthService(t *testing.T) {
 		helper.PanicIfError(err)
 
 		cookie := &http.Cookie{
-			Name:  "jid",
+			Name:  constanta.JID,
 			Value: resBody.Data.RefreshToken,
 			Path:  "/",
 		}

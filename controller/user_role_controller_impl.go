@@ -26,7 +26,7 @@ func (controller *UserRoleControllerImpl) FindAll(w http.ResponseWriter, r *http
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	userRoleResponses := controller.UserRoleService.FindAll(ctx, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	userRoleResponses := controller.UserRoleService.FindAll(ctx, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -45,7 +45,7 @@ func (controller *UserRoleControllerImpl) FindById(w http.ResponseWriter, r *htt
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	userRoleResponse := controller.UserRoleService.FindById(ctx, userRoleId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	userRoleResponse := controller.UserRoleService.FindById(ctx, userRoleId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -62,7 +62,7 @@ func (controller *UserRoleControllerImpl) Create(w http.ResponseWriter, r *http.
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	userRoleResponse := controller.UserRoleService.Create(ctx, userRoleCreateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	userRoleResponse := controller.UserRoleService.Create(ctx, userRoleCreateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -86,7 +86,7 @@ func (controller *UserRoleControllerImpl) Update(w http.ResponseWriter, r *http.
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	userRoleResponse := controller.UserRoleService.Update(ctx, userRoleUpdateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	userRoleResponse := controller.UserRoleService.Update(ctx, userRoleUpdateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -105,7 +105,7 @@ func (controller *UserRoleControllerImpl) Delete(w http.ResponseWriter, r *http.
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	controller.UserRoleService.Delete(ctx, userRoleId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	controller.UserRoleService.Delete(ctx, userRoleId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,

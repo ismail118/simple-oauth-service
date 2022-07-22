@@ -4,6 +4,8 @@ import (
 	validator2 "github.com/go-playground/validator"
 	"gopkg.in/gomail.v2"
 	"net/http"
+	"os"
+	config2 "simple-oauth-service/config"
 	"simple-oauth-service/controller"
 	"simple-oauth-service/database"
 	"simple-oauth-service/helper"
@@ -13,14 +15,16 @@ import (
 )
 
 func main() {
-	db := database.NewDB()
-	rdb := database.NewRedisClient()
+	fileConfig := os.Getenv("SIMPLE_OAUTH_SERVICE_CONFIG")
+	config := config2.NewConfig(fileConfig)
+	db := database.NewDB(config)
+	rdb := database.NewRedisClient(config)
 	validator := validator2.New()
 	dialer := gomail.NewDialer(
-		"smtp.gmail.com",
-		587,
-		"oauthserver99@gmail.com",
-		"tvvlczggnxyvmham",
+		config.Email.Host,
+		config.Email.Port,
+		config.Email.Email,
+		config.Email.Password,
 	)
 
 	oauth2Repository := repository.NewOauth2Repository()

@@ -83,7 +83,7 @@ func AuthorizationHandler(next http.Handler) http.Handler {
 			return
 		}
 
-		xAuthorizationHeader := r.Header.Get("X-Authorization-Key")
+		xAuthorizationHeader := r.Header.Get(constanta.XAuthorizationKey)
 		if xAuthorizationHeader == "" {
 			helper.PanicIfError(errors.UnauthorizedError{constanta.StatusUnauthorized})
 		}

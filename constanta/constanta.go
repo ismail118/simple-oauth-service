@@ -25,6 +25,14 @@ const InvalidOtp = "Invalid OTP"
 const SubjectUserCreate = "Your OTP from Simple Oauth Service"
 const AccessToken = "access_token"
 const RefreshToken = "refresh_token"
+const ClientId = "clientId"
+const DataScopeId = "dataScopeId"
+const XAuthorizationKey = "X-Authorization-Key"
+const JID = "jid"
+const Client_Id = "client_id"
+const Redirect_Url = "redirect_url"
+const Email = "email"
+const Password = "password"
 
 //HTTP STATUS
 //Successful responses

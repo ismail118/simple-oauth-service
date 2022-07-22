@@ -25,14 +25,27 @@ func NewOauth2Controller(oauth2Service service.OAuth2Service) OAuth2Controller {
 }
 
 func (controller *OAuth2ControllerImpl) Authorize(w http.ResponseWriter, r *http.Request) {
-
 	u, err := url.Parse(r.URL.String())
 	helper.PanicIfError(err)
 
-	clientId, err := strconv.ParseInt(u.Query()["client_id"][0], 10, 64)
+	data, ok := u.Query()[constanta.Client_Id]
+	if !ok || len(data) < 1 {
+		panic(errors2.NewValidationErrors(constanta.Client_Id))
+	}
+	clientId, err := strconv.ParseInt(data[0], 10, 64)
 	helper.PanicIfError(err)
-	redirectUrl := u.Query()["redirect_url"][0]
-	state := u.Query()["state"][0]
+
+	data, ok = u.Query()[constanta.Redirect_Url]
+	if !ok || len(data) < 1 {
+		panic(errors2.NewValidationErrors(constanta.Redirect_Url))
+	}
+	redirectUrl := data[0]
+
+	data, ok = u.Query()[constanta.State]
+	if !ok || len(data) < 1 {
+		panic(errors2.NewValidationErrors(constanta.State))
+	}
+	state := data[0]
 
 	authorizeRequest := request.AuthorizeRequest{
 		ClientId:    clientId,
@@ -42,23 +55,36 @@ func (controller *OAuth2ControllerImpl) Authorize(w http.ResponseWriter, r *http
 	controller.Oauth2Service.Authorize(r.Context(), authorizeRequest)
 
 	loginUrl := fmt.Sprintf("/oauth/login?client_id=%d&redirect_url=%s&state=%s", clientId, redirectUrl, state)
-	http.Redirect(w, r, loginUrl, http.StatusPermanentRedirect)
+	http.Redirect(w, r, loginUrl, http.StatusTemporaryRedirect)
 }
 
 func (controller *OAuth2ControllerImpl) Login(w http.ResponseWriter, r *http.Request) {
-
 	_, isValidToken := helper.ValidateRefreshToken(r)
 
 	u, err := url.Parse(r.URL.String())
 	helper.PanicIfError(err)
 
-	clientId, err := strconv.ParseInt(u.Query()["client_id"][0], 10, 64)
+	data, ok := u.Query()[constanta.Client_Id]
+	if !ok || len(data) < 1 {
+		panic(errors2.NewValidationErrors(constanta.Client_Id))
+	}
+	clientId, err := strconv.ParseInt(data[0], 10, 64)
 	helper.PanicIfError(err)
-	redirectUrl := u.Query()["redirect_url"][0]
-	state := u.Query()["state"][0]
 
-	email := r.FormValue("email")
-	password := r.FormValue("password")
+	data, ok = u.Query()[constanta.Redirect_Url]
+	if !ok || len(data) < 1 {
+		panic(errors2.NewValidationErrors(constanta.Redirect_Url))
+	}
+	redirectUrl := data[0]
+
+	data, ok = u.Query()[constanta.State]
+	if !ok || len(data) < 1 {
+		panic(errors2.NewValidationErrors(constanta.State))
+	}
+	state := data[0]
+
+	email := r.FormValue(constanta.Email)
+	password := r.FormValue(constanta.Password)
 
 	if email == "" && password == "" && !isValidToken {
 		t, err2 := template.ParseFS(templates.Templates, "*.gohtml")
@@ -70,7 +96,7 @@ func (controller *OAuth2ControllerImpl) Login(w http.ResponseWriter, r *http.Req
 		helper.PanicIfError(err2)
 		return
 	} else if isValidToken {
-		http.Redirect(w, r, "/oauth/refresh_token", http.StatusPermanentRedirect)
+		http.Redirect(w, r, "/oauth/refresh_token", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -83,7 +109,7 @@ func (controller *OAuth2ControllerImpl) Login(w http.ResponseWriter, r *http.Req
 
 	callbackUrl := fmt.Sprintf("%s?code=%s&state=%s", redirectUrl, codeResponse.AuthorizationCode, state)
 
-	http.Redirect(w, r, callbackUrl, http.StatusPermanentRedirect)
+	http.Redirect(w, r, callbackUrl, http.StatusTemporaryRedirect)
 }
 
 func (controller *OAuth2ControllerImpl) AccessToken(w http.ResponseWriter, r *http.Request) {
@@ -102,7 +128,7 @@ func (controller *OAuth2ControllerImpl) AccessToken(w http.ResponseWriter, r *ht
 }
 
 func (controller *OAuth2ControllerImpl) RefreshToken(w http.ResponseWriter, r *http.Request) {
-	c, err := r.Cookie("jid")
+	c, err := r.Cookie(constanta.JID)
 	if err != nil && errors.Is(err, http.ErrNoCookie) {
 		panic(errors2.NewUnauthorizedError(constanta.StatusUnauthorized))
 	} else if err != nil {
@@ -110,8 +136,6 @@ func (controller *OAuth2ControllerImpl) RefreshToken(w http.ResponseWriter, r *h
 	}
 
 	accessTokenResponse, cookie := controller.Oauth2Service.RefreshToken(r.Context(), c)
-
-	c.MaxAge = -1
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -147,13 +171,13 @@ func (controller *OAuth2ControllerImpl) InternalLogin(w http.ResponseWriter, r *
 		helper.PanicIfError(err2)
 		return
 	} else if isValidToken {
-		http.Redirect(w, r, "/oauth/refresh_token", http.StatusPermanentRedirect)
+		http.Redirect(w, r, "/oauth/refresh_token", http.StatusTemporaryRedirect)
 		return
 	}
 
 	credential := request.LoginRequest{
-		Email:    r.FormValue("email"),
-		Password: r.FormValue("password"),
+		Email:    r.FormValue(constanta.Email),
+		Password: r.FormValue(constanta.Password),
 	}
 
 	accessTokenResponse, cookie := controller.Oauth2Service.InternalLogin(r.Context(), credential)

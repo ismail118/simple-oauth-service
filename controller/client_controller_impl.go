@@ -26,7 +26,7 @@ func (controller *ClientControllerImpl) FindAll(w http.ResponseWriter, r *http.R
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	clientResponses := controller.ClientService.FindAll(ctx, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	clientResponses := controller.ClientService.FindAll(ctx, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -39,13 +39,13 @@ func (controller *ClientControllerImpl) FindAll(w http.ResponseWriter, r *http.R
 func (controller *ClientControllerImpl) FindById(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	clientId, err := strconv.ParseInt(vars["clientId"], 10, 64)
+	clientId, err := strconv.ParseInt(vars[constanta.ClientId], 10, 64)
 	helper.PanicIfError(err)
 
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	clientResponse := controller.ClientService.FindById(ctx, clientId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	clientResponse := controller.ClientService.FindById(ctx, clientId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -62,7 +62,7 @@ func (controller *ClientControllerImpl) Create(w http.ResponseWriter, r *http.Re
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	clientResponse := controller.ClientService.Create(ctx, clientCreateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	clientResponse := controller.ClientService.Create(ctx, clientCreateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -75,7 +75,7 @@ func (controller *ClientControllerImpl) Create(w http.ResponseWriter, r *http.Re
 func (controller *ClientControllerImpl) Update(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	clientId, err := strconv.ParseInt(vars["clientId"], 10, 64)
+	clientId, err := strconv.ParseInt(vars[constanta.ClientId], 10, 64)
 	helper.PanicIfError(err)
 
 	var clientUpdateRequest request.ClientUpdateRequest
@@ -86,7 +86,7 @@ func (controller *ClientControllerImpl) Update(w http.ResponseWriter, r *http.Re
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	clientResponse := controller.ClientService.Update(ctx, clientUpdateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	clientResponse := controller.ClientService.Update(ctx, clientUpdateRequest, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
@@ -99,13 +99,13 @@ func (controller *ClientControllerImpl) Update(w http.ResponseWriter, r *http.Re
 func (controller *ClientControllerImpl) Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	clientId, err := strconv.ParseInt(vars["clientId"], 10, 64)
+	clientId, err := strconv.ParseInt(vars[constanta.ClientId], 10, 64)
 	helper.PanicIfError(err)
 
 	ctx, err := ctx2.ToCtxContext(r.Context())
 	helper.PanicIfError(err)
 
-	controller.ClientService.Delete(ctx, clientId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleDistributor)
+	controller.ClientService.Delete(ctx, clientId, constanta.RoleAdmin, constanta.RolePrincipal, constanta.RoleDistributor, constanta.RoleBuyer)
 
 	webResponse := response.WebResponse{
 		Code:   http.StatusOK,
